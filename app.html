@@ -16,30 +16,42 @@
     <!-- Navbar -->
     <nav class="flex justify-between items-center p-5 bg-blue-500 text-white">
         <div class="text-lg font-semibold">Member Portal</div>
-        <div class="space-x-4 hidden md:flex">
+        <div id="desktopMenu" class="space-x-4 hidden md:flex">
             <a href="#" onclick="signOut()">Sign Out</a>
             <a href="edit.html">Edit Profile</a>
         </div>
         <button id="menuBtn" class="block md:hidden focus:outline-none">☰</button>
     </nav>
 
-    <!-- Hamburger Menu -->
+    <!-- Hamburger Menu for Mobile -->
     <div id="menu" class="hidden flex-col items-center bg-blue-500 text-white p-4 md:hidden">
         <a href="#" onclick="signOut()">Sign Out</a>
         <a href="edit.html">Edit Profile</a>
     </div>
 
-    <!-- Hero Section -->
+    <!-- Hero Section with Profile Hover Box -->
     <section class="flex justify-between items-center p-6 bg-white shadow-md">
         <h1 class="text-2xl font-bold">Welcome to the Member Portal</h1>
-        <div id="profilePic" class="relative w-12 h-12 rounded-full overflow-hidden">
-            <img src="" alt="User Profile" id="userProfilePic" class="object-cover w-full h-full">
-            <div id="profileHover" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-sm text-white opacity-0 hover:opacity-100 transition-opacity">
-                <a href="edit.html">Edit Profile</a>
-                <a href="#" onclick="signOut()">Sign Out</a>
+        <div class="relative" id="profileContainer">
+            <div id="profilePic" class="w-12 h-12 rounded-full overflow-hidden cursor-pointer">
+                <img src="def.png" alt="User Profile" id="userProfilePic" class="object-cover w-full h-full">
+            </div>
+            <div id="profileHover" class="profile-hover absolute hidden bg-white shadow-lg rounded-lg text-center p-2">
+                <a href="edit.html" class="block text-blue-500 hover:text-blue-700">Edit Profile</a>
+                <a href="#" onclick="signOut()" class="block text-red-500 hover:text-red-700">Sign Out</a>
             </div>
         </div>
     </section>
+
+    <!-- Search Bar -->
+    <section class="p-6">
+        <input type="text" id="searchInput" placeholder="Search by name or section..." class="w-full p-2 rounded-lg border border-gray-300">
+    </section>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="flex justify-center items-center p-6 hidden">
+        <div class="loader"></div>
+    </div>
 
     <!-- User Cards Section -->
     <section id="userCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">

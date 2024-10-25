@@ -15,13 +15,32 @@ const auth = firebase.auth();
 const db = firebase.database();
 
 // Toggle Hamburger Menu
-document.getElementById('menuBtn').addEventListener('click', () => {
-    const menu = document.getElementById('menu');
+const menuBtn = document.getElementById('menuBtn');
+const menu = document.getElementById('menu');
+menuBtn.addEventListener('click', () => {
     menu.classList.toggle('hidden');
 });
 
-// Fetch and Display User Cards
+// Profile Picture Hover Toggle
+const profilePic = document.getElementById('profilePic');
+const profileHover = document.getElementById('profileHover');
+const profileContainer = document.getElementById('profileContainer');
+
+// Show the profile hover box on mouseenter and keep it visible
+profileContainer.addEventListener('mouseenter', () => {
+    profileHover.classList.remove('hidden');
+});
+
+// Hide the profile hover box on mouseleave
+profileContainer.addEventListener('mouseleave', () => {
+    profileHover.classList.add('hidden');
+});
+
+// Fetch and Display User Cards with Loading Spinner
 function displayUserCards() {
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    loadingSpinner.classList.remove('hidden');
+
     db.ref('users').once('value').then(snapshot => {
         const users = snapshot.val();
         const userCards = document.getElementById('userCards');
@@ -29,12 +48,14 @@ function displayUserCards() {
 
         Object.keys(users).forEach(uid => {
             const user = users[uid];
+            const profilePicUrl = user.profilePicture || 'def.png'; // Default profile picture
+
             const card = document.createElement('div');
             card.className = 'card p-4 bg-white shadow-lg rounded-lg';
 
             // User card content
             card.innerHTML = `
-                <img src="${user.profilePicture}" class="w-16 h-16 rounded-full mx-auto" alt="Profile Picture">
+                <img src="${profilePicUrl}" class="w-16 h-16 rounded-full mx-auto" alt="Profile Picture">
                 <h3 class="text-center font-semibold mt-2">${user.name}</h3>
                 <p class="text-center text-gray-500">${user.section}</p>
                 <p class="text-center text-sm text-gray-400">Birthday: ${user.birthday}</p>
@@ -42,13 +63,15 @@ function displayUserCards() {
 
             userCards.appendChild(card);
         });
+
+        loadingSpinner.classList.add('hidden'); // Hide loading spinner
     });
 }
 
 // Sign Out
 function signOut() {
     auth.signOut().then(() => {
-        window.location.href = './sign.html'; // Redirect to sign-in page
+        window.location.href = 'index.html'; // Redirect to sign-in page
     }).catch(error => {
         console.error("Sign-out error:", error);
     });
@@ -59,11 +82,28 @@ auth.onAuthStateChanged(user => {
     if (user) {
         db.ref('users/' + user.uid).once('value').then(snapshot => {
             const userData = snapshot.val();
-            document.getElementById('userProfilePic').src = userData.profilePicture;
+            document.getElementById('userProfilePic').src = userData.profilePicture || 'def.png';
         });
     } else {
-        window.location.href = './sign.html'; // Redirect if not logged in
+        window.location.href = 'index.html'; // Redirect if not logged in
     }
+});
+
+// Search Functionality
+document.getElementById('searchInput').addEventListener('input', (event) => {
+    const searchValue = event.target.value.toLowerCase();
+
+    const allCards = document.querySelectorAll('#userCards .card');
+    allCards.forEach(card => {
+        const name = card.querySelector('h3').innerText.toLowerCase();
+        const section = card.querySelector('p').innerText.toLowerCase();
+        
+        if (name.includes(searchValue) || section.includes(searchValue)) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
 });
 
 // Display user cards when page loads

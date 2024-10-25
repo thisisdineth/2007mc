@@ -1,6 +1,8 @@
-/* Profile picture hover effect */
-#profilePic:hover #profileHover {
-    opacity: 1;
+/* Profile Picture Hover Effect */
+#profileHover {
+    width: 100px;
+    padding: 5px;
+    transition: opacity 0.3s ease;
 }
 
 /* Card animation */
@@ -28,4 +30,73 @@
     #menu {
         display: flex;
     }
+}
+
+/* Loading Spinner */
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* Profile Picture Hover Effect */
+#profileHover {
+    width: 120px;
+    padding: 5px;
+    top: 50px; /* Positioned below the profile pic */
+    right: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+/* Card animation */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide desktop menu on mobile */
+#desktopMenu {
+    display: none;
+}
+
+/* Mobile Hamburger Menu */
+#menuBtn {
+    cursor: pointer;
+}
+
+/* Show desktop menu on larger screens */
+@media (min-width: 768px) {
+    #desktopMenu {
+        display: flex;
+    }
+    #menu {
+        display: none;
+    }
+}
+
+/* Loading Spinner */
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

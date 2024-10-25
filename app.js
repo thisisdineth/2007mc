@@ -14,21 +14,24 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-
-
 // Profile Picture Hover Toggle
 const profilePic = document.getElementById('profilePic');
 const profileHover = document.getElementById('profileHover');
 const profileContainer = document.getElementById('profileContainer');
 
-// Show the profile hover box on mouseenter and keep it visible
+// Show profile hover box and keep visible on hover
 profileContainer.addEventListener('mouseenter', () => {
     profileHover.classList.remove('hidden');
 });
 
-// Hide the profile hover box on mouseleave
-profileContainer.addEventListener('mouseleave', () => {
+profileHover.addEventListener('mouseleave', () => {
     profileHover.classList.add('hidden');
+});
+
+profileContainer.addEventListener('mouseleave', (e) => {
+    if (!profileHover.contains(e.relatedTarget)) {
+        profileHover.classList.add('hidden');
+    }
 });
 
 // Fetch and Display User Cards with Loading Spinner
@@ -48,12 +51,17 @@ function displayUserCards() {
             const card = document.createElement('div');
             card.className = 'card p-4 bg-white shadow-lg rounded-lg';
 
+            // Check if UID matches the one for verification
+            const isVerified = uid === '1pKKDxXspXaukLY115S53cO8kLV2';
+            const verificationIcon = isVerified ? '<i class="fas fa-check-circle text-blue-500 ml-1"></i>' : '';
+
             // User card content
             card.innerHTML = `
                 <img src="${profilePicUrl}" class="w-16 h-16 rounded-full mx-auto" alt="Profile Picture">
-                <h3 class="text-center font-semibold mt-2">${user.name}</h3>
+                <h3 class="text-center font-semibold mt-2">${user.name} ${verificationIcon}</h3>
                 <p class="text-center text-gray-500">${user.section}</p>
                 <p class="text-center text-sm text-gray-400">Birthday: ${user.birthday}</p>
+                <a href="profile.html?uid=${uid}" class="text-center text-blue-500 hover:text-blue-700 mt-2 block">View Profile</a>
             `;
 
             userCards.appendChild(card);
@@ -62,6 +70,7 @@ function displayUserCards() {
         loadingSpinner.classList.add('hidden'); // Hide loading spinner
     });
 }
+
 
 // Sign Out
 function signOut() {
@@ -84,22 +93,31 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// Search Functionality
-document.getElementById('searchInput').addEventListener('input', (event) => {
-    const searchValue = event.target.value.toLowerCase();
+// Debounce function to limit search input frequency
+function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
 
+// Search Functionality with Debounce
+document.getElementById('searchInput').addEventListener('input', debounce((event) => {
+    const searchValue = event.target.value.toLowerCase();
     const allCards = document.querySelectorAll('#userCards .card');
+
     allCards.forEach(card => {
         const name = card.querySelector('h3').innerText.toLowerCase();
         const section = card.querySelector('p').innerText.toLowerCase();
-        
+
         if (name.includes(searchValue) || section.includes(searchValue)) {
             card.classList.remove('hidden');
         } else {
             card.classList.add('hidden');
         }
     });
-});
+}, 300));
 
 // Display user cards when page loads
 window.onload = displayUserCards;

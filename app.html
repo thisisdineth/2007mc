@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <link rel="stylesheet" href="app.css">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -12,11 +14,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 </head>
-<body>
 
+<body>
 <!-- Hero Section with Profile Hover Box -->
 <section class="hero-section flex justify-between items-center">
-    <h1 class="text-2xl font-bold">You can find your friends' details here!</h1>
+    <h1 class="text-2xl font-bold">2K26 A/L All Brothers<i class="fa fa-check" aria-hidden="true"></i></h1>
     <div class="relative" id="profileContainer">
         <div id="profilePic" class="w-12 h-12 rounded-full overflow-hidden cursor-pointer">
             <img src="./img/def.png" alt="User Profile" id="userProfilePic" class="object-cover w-full h-full">
@@ -32,6 +34,7 @@
     <section class="p-6">
         <input type="text" id="searchInput" placeholder="Search by name or section..." class="w-full p-2 rounded-lg border border-gray-300">
     </section>
+    
 
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="flex justify-center items-center p-6 hidden">

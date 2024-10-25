@@ -63,7 +63,7 @@ function displayUserCards() {
             const verificationIcon = isVerified ? 
                 `<span class="relative inline-block">
                     <i class="fas fa-check-circle text-blue-500 ml-1" id="verificationTick"></i>
-                    <span class="tooltip hidden absolute left-1/2 transform -translate-x-1/2 -translate-y-full mt-1 bg-gray-800 text-white text-xs rounded px-2 py-1">Verified Member</span>
+                    <span class="tooltip hidden absolute left-1/2 transform -translate-x-1/2 -translate-y-full mt-1 bg-gray-800 text-white text-xs rounded px-2 py-1">Verified</span>
                 </span>` 
                 : '';
 

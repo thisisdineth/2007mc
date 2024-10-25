@@ -27,6 +27,13 @@ body {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+.tooltip {
+    display: none; /* Initially hide the tooltip */
+}
+
+#verificationTick:hover + .tooltip {
+    display: block; /* Show the tooltip on hover */
+}
 
 
 /* Loading Spinner */

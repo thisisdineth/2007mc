@@ -8,7 +8,7 @@
 
 /* Body styling */
 body {
-    background: linear-gradient(135deg, #dedfd5 0%, #f6ec92 100%);
+    background: linear-gradient(135deg, #987d01, #020200);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -24,7 +24,7 @@ header {
 }
 header h1 {
     font-size: 2em;
-    color: #333;
+    color: #d7d7d7;
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -33,7 +33,7 @@ header h1 {
 .container {
     width: 100%;
     max-width: 500px;
-    background: #fff;
+    background: #eecc65;
     border-radius: 10px;
     padding: 20px 30px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
@@ -53,12 +53,12 @@ header h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background: #333;
+    background: #b89101;
     color: #fff;
     transition: 0.3s ease;
 }
 #toggle-btns button:hover {
-    background: #555;
+    background: #927303;
 }
 
 /* Loader styling */
@@ -127,14 +127,14 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background: #333;
+    background: #b89101;
     color: #fff;
     font-size: 1em;
     transition: 0.3s ease;
     margin-top: 10px;
 }
 button:hover {
-    background: #555;
+    background: #907102;
 }
 
 /* Forgot password button */

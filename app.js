@@ -14,91 +14,67 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-window.onload = function() {
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            const userProfilePic = document.getElementById('userProfilePic');
-            const userName = document.getElementById('userName');
-            userProfilePic.src = user.photoURL || './img/default-profile.png'; // Default picture if none
-            userName.innerText = user.displayName || user.email; // Display user's name or email
+// Check Authentication Status
+auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById('profilePicture').src = user.photoURL || 'default-profile.png'; // Set default image if none exists
+        document.getElementById('userName').innerText = user.displayName || user.email;
+        loadUsers();
+    } else {
+        window.location.href = "sign.html"; // Redirect to sign in page if not authenticated
+    }
+});
 
-            fetchUsers();
-            
-            // Sign out functionality
-            document.getElementById('signOut').onclick = function() {
-                auth.signOut().then(() => {
-                    window.location.href = "sign.html"; // Redirect to sign-in page
-                });
-            };
-        } else {
-            window.location.href = "sign.html"; // Redirect to sign-in page if not logged in
+// Load Users Function
+function loadUsers() {
+    db.ref('users').once('value').then(snapshot => {
+        const users = snapshot.val();
+        const container = document.getElementById('userCardsContainer');
+        container.innerHTML = ''; // Clear previous users
+        for (const uid in users) {
+            const userData = users[uid];
+            const card = document.createElement('div');
+            card.classList.add('user-card');
+            card.innerHTML = `
+                <img src="${userData.profilePicture || 'default-profile.png'}" alt="${userData.name}" />
+                <h3>${userData.name}</h3>
+                <p>Section: ${userData.section}</p>
+                <p>Birthday: ${userData.birthday}</p>
+            `;
+            container.appendChild(card);
         }
     });
-};
-
-// Fetch Users from Firebase
-function fetchUsers() {
-    const userCardsContainer = document.getElementById('userCardsContainer');
-    userCardsContainer.innerHTML = ''; // Clear the container
-
-    db.ref('users').once('value')
-        .then(snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const userData = childSnapshot.val();
-                const userCard = document.createElement('div');
-                userCard.classList.add('user-card');
-                userCard.innerHTML = `
-                    <img src="${userData.profilePic || './img/logo.png'}" alt="User Profile Picture">
-                    <div>
-                        <button onclick="shareProfile('${userData.schoolId}')">
-                            <i class="fas fa-share-square"></i> Share Profile
-                        </button>
-                        <button onclick="viewProfile('${childSnapshot.key}')">
-                            <i class="fas fa-eye"></i> View Profile
-                        </button>
-                    </div>
-                `;
-                userCardsContainer.appendChild(userCard);
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching users:", error);
-        });
 }
 
-// Filter Users
-function filterUsers() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+// Sign Out Function
+function signOut() {
+    auth.signOut().then(() => {
+        window.location.href = "sign.html"; // Redirect to sign in page after sign out
+    });
+}
+
+// Search Function
+function searchUsers() {
+    const query = document.getElementById('searchBar').value.toLowerCase();
     const userCards = document.getElementsByClassName('user-card');
 
     Array.from(userCards).forEach(card => {
-        const name = card.querySelector('h4')?.innerText.toLowerCase() || '';
-        card.style.display = name.includes(searchInput) ? 'flex' : 'none';
+        const name = card.querySelector('h3').innerText.toLowerCase();
+        if (name.includes(query)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
     });
 }
 
-// Share Profile Function
-function shareProfile(schoolId) {
-    const phoneNumber = schoolId; // Use school ID as the phone number
-    const waLink = `https://wa.me/${phoneNumber}`;
-    window.open(waLink, '_blank'); // Open WhatsApp link in a new tab
+// Hamburger Menu Toggle
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
 }
 
-// View Profile Function
-function viewProfile(userId) {
-    db.ref('users/' + userId).once('value')
-        .then(snapshot => {
-            const userData = snapshot.val();
-            document.getElementById('profilePic').src = userData.profilePic || './img/default.jpg';
-            document.getElementById('profileName').innerText = userData.name || 'User';
-            document.getElementById('profileOverlay').style.display = 'flex';
-        })
-        .catch(error => {
-            console.error("Error fetching profile:", error);
-        });
-}
-
-// Close Profile View
-function closeProfileView() {
-    document.getElementById('profileOverlay').style.display = 'none';
-}
+// Placeholder functions for navigation
+function loadHome() { /* Logic to load home content */ }
+function loadPortal() { /* Logic to load portal content */ }
+function loadApps() { /* Logic to load apps content */ }

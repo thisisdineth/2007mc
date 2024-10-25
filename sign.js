@@ -69,6 +69,9 @@ function signUp() {
     const fileInput = document.getElementById('profilePicture'); // Get the file input
     const file = fileInput.files[0]; // Get the selected file
 
+    // Get the selected section studied value
+    const section = document.querySelector('input[name="section"]:checked').value;
+
     // Create user with email and password
     auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
@@ -80,6 +83,7 @@ function signUp() {
                 name: name,
                 email: email,
                 birthday: document.getElementById('birthday').value,
+                section: section // Add the section studied to user data
             };
 
             // Store the user data in the Realtime Database

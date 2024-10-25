@@ -8,10 +8,6 @@ body {
     padding: 5px;
     transition: opacity 0.3s ease;
 }
-nav {
-    background-color: #393604 !important; /* Deep blue color for the header */
-    color: #ffffff; /* White text color for visibility */
-}
 
 /* Hero Section Background Color */
 .hero-section {
@@ -31,17 +27,7 @@ nav {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Mobile Hamburger Menu */
-#menuBtn {
-    cursor: pointer;
-}
 
-/* Show menu on small screens */
-@media (max-width: 768px) {
-    #menu {
-        display: flex;
-    }
-}
 
 /* Loading Spinner */
 .loader {
@@ -77,25 +63,6 @@ nav {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Hide desktop menu on mobile */
-#desktopMenu {
-    display: none;
-}
-
-/* Mobile Hamburger Menu */
-#menuBtn {
-    cursor: pointer;
-}
-
-/* Show desktop menu on larger screens */
-@media (min-width: 768px) {
-    #desktopMenu {
-        display: flex;
-    }
-    #menu {
-        display: none;
-    }
-}
 
 /* Loading Spinner */
 .loader {

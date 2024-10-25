@@ -66,10 +66,12 @@ function signUp() {
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const fileInput = document.getElementById('profilePicture'); // Get the file input
+    const file = fileInput.files[0]; // Get the selected file
 
+    // Create user with email and password
     auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
-            // User signed up successfully, now store user data in Realtime Database
             const user = userCredential.user;
 
             // Create a user object to store in the database
@@ -81,7 +83,23 @@ function signUp() {
             };
 
             // Store the user data in the Realtime Database
-            return db.ref('users/' + user.uid).set(userData);
+            return db.ref('users/' + user.uid).set(userData).then(() => {
+                // Now upload the profile picture to Firebase Storage
+                if (file) {
+                    const storageRef = firebase.storage().ref(); // Create a storage reference
+                    const profilePicRef = storageRef.child('profilePictures/' + user.uid + '/' + file.name); // Create a reference to the file location
+
+                    return profilePicRef.put(file).then(snapshot => {
+                        // Get the download URL of the uploaded image
+                        return snapshot.ref.getDownloadURL().then(downloadURL => {
+                            // Update user data with the profile picture URL
+                            return db.ref('users/' + user.uid).update({
+                                profilePicture: downloadURL
+                            });
+                        });
+                    });
+                }
+            });
         })
         .then(() => {
             showLoader(false);
@@ -92,6 +110,7 @@ function signUp() {
             showError(error.message);
         });
 }
+
 
 
 // Sign In Function

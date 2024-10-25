@@ -17,7 +17,19 @@ const db = firebase.database();
 window.onload = function() {
     auth.onAuthStateChanged(user => {
         if (user) {
+            const userProfilePic = document.getElementById('userProfilePic');
+            const userName = document.getElementById('userName');
+            userProfilePic.src = user.photoURL || './img/default-profile.png'; // Default picture if none
+            userName.innerText = user.displayName || user.email; // Display user's name or email
+
             fetchUsers();
+            
+            // Sign out functionality
+            document.getElementById('signOut').onclick = function() {
+                auth.signOut().then(() => {
+                    window.location.href = "sign.html"; // Redirect to sign-in page
+                });
+            };
         } else {
             window.location.href = "sign.html"; // Redirect to sign-in page if not logged in
         }
@@ -36,12 +48,9 @@ function fetchUsers() {
                 const userCard = document.createElement('div');
                 userCard.classList.add('user-card');
                 userCard.innerHTML = `
-                    <img src="${userData.profilePic || './img/logo.png'}" alt="${userData.name}">
+                    <img src="${userData.profilePic || './img/logo.png'}" alt="User Profile Picture">
                     <div>
-                        <h4>${userData.name}</h4>
-                        <p>Section: ${userData.section || 'Not defined'}</p>
-                        <p>Birthday: ${new Date(userData.birthday).toLocaleDateString()}</p>
-                        <button onclick="shareProfile('${childSnapshot.key}')">
+                        <button onclick="shareProfile('${userData.schoolId}')">
                             <i class="fas fa-share-square"></i> Share Profile
                         </button>
                         <button onclick="viewProfile('${childSnapshot.key}')">
@@ -63,21 +72,16 @@ function filterUsers() {
     const userCards = document.getElementsByClassName('user-card');
 
     Array.from(userCards).forEach(card => {
-        const name = card.querySelector('h4').innerText.toLowerCase();
+        const name = card.querySelector('h4')?.innerText.toLowerCase() || '';
         card.style.display = name.includes(searchInput) ? 'flex' : 'none';
     });
 }
 
 // Share Profile Function
-function shareProfile(userId) {
-    const profileLink = `${window.location.origin}/profile.html?user=${userId}`;
-    navigator.clipboard.writeText(profileLink)
-        .then(() => {
-            alert("Profile link copied to clipboard!");
-        })
-        .catch(err => {
-            console.error("Failed to copy: ", err);
-        });
+function shareProfile(schoolId) {
+    const phoneNumber = schoolId; // Use school ID as the phone number
+    const waLink = `https://wa.me/${phoneNumber}`;
+    window.open(waLink, '_blank'); // Open WhatsApp link in a new tab
 }
 
 // View Profile Function
@@ -85,10 +89,8 @@ function viewProfile(userId) {
     db.ref('users/' + userId).once('value')
         .then(snapshot => {
             const userData = snapshot.val();
-            document.getElementById('profilePic').src = userData.profilePic || 'default.jpg';
-            document.getElementById('profileName').innerText = userData.name;
-            document.getElementById('profileSection').innerText = "Section: " + (userData.section || 'Not defined');
-            document.getElementById('profileBirthday').innerText = "Birthday: " + new Date(userData.birthday).toLocaleDateString();
+            document.getElementById('profilePic').src = userData.profilePic || './img/default.jpg';
+            document.getElementById('profileName').innerText = userData.name || 'User';
             document.getElementById('profileOverlay').style.display = 'flex';
         })
         .catch(error => {

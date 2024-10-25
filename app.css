@@ -17,6 +17,18 @@ header {
     position: relative;
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
 h1 {
     margin: 0;
 }

@@ -14,12 +14,17 @@
 </head>
 <body>
     <header>
-        <h1>Mahanama College Alumni</h1>
+        <div class="user-info" id="userInfo">
+            <img id="userProfilePic" src="" alt="User Profile Picture">
+            <span id="userName"></span>
+        </div>
         <div class="menu-toggle" id="menuToggle">☰</div>
         <nav class="sidebar" id="sidebar">
             <ul>
                 <li><a href="./index.html">Home</a></li>
-                <li><a href="./app.html">User Profiles</a></li>
+                <li><a href="./app.html">Portal</a></li>
+                <li><a href="./apps.html">Apps</a></li>
+                <li><a href="#" id="signOut">Sign Out</a></li>
             </ul>
         </nav>
     </header>
@@ -40,8 +45,6 @@
             <span class="close" onclick="closeProfileView()">&times;</span>
             <img id="profilePic" src="" alt="Profile Picture">
             <h3 id="profileName"></h3>
-            <p id="profileSection"></p>
-            <p id="profileBirthday"></p>
         </div>
     </div>
 

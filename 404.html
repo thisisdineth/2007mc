@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Construction</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        /* Container styling */
+        .container {
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 5em;
+            color: #f39c12;
+            margin-bottom: 20px;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Animated dots */
+        .dots span {
+            display: inline-block;
+            font-size: 1.5em;
+            color: #333;
+            animation: blink 1.5s infinite;
+        }
+        
+        .dots span:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .dots span:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        /* Button styling */
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #e67e22;
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="icon">🚧</div>
+        <h1>We're Under Construction</h1>
+        <p>Our website is getting a makeover! We'll be back soon.</p>
+        <div class="dots">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+        </div>
+        <br><br>
+        <a href="#" class="button">Notify Me</a>
+    </div>
+
+</body>
+</html>

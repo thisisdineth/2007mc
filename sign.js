@@ -51,7 +51,7 @@ function isValidBirthdate() {
     if (birthDate >= startDate && birthDate <= endDate) {
         return true;
     } else {
-        showError("Only users born in 2007 or January 2008 can sign up.");
+        showError("Are you sure you are in our batch?");
         return false;
     }
 }

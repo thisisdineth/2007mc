@@ -87,7 +87,7 @@ function signIn() {
     auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
             showLoader(false);
-            window.location.href = "index.html";
+            window.location.href = "404.html";
         })
         .catch(error => {
             showLoader(false);

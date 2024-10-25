@@ -36,7 +36,7 @@ function fetchUsers() {
                 const userCard = document.createElement('div');
                 userCard.classList.add('user-card');
                 userCard.innerHTML = `
-                    <img src="${userData.profilePic || 'default.jpg'}" alt="${userData.name}">
+                    <img src="${userData.profilePic || './img/logo.png'}" alt="${userData.name}">
                     <div>
                         <h4>${userData.name}</h4>
                         <p>Section: ${userData.section || 'Not defined'}</p>

@@ -1,3 +1,3 @@
 function navigateToSign() {
-    window.location.href = "sign.html";
+    window.location.href = "./app.html";
 }

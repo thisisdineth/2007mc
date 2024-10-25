@@ -69,14 +69,30 @@ function signUp() {
 
     auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
+            // User signed up successfully, now store user data in Realtime Database
+            const user = userCredential.user;
+
+            // Create a user object to store in the database
+            const userData = {
+                uid: user.uid,
+                name: name,
+                email: email,
+                birthday: document.getElementById('birthday').value,
+            };
+
+            // Store the user data in the Realtime Database
+            return db.ref('users/' + user.uid).set(userData);
+        })
+        .then(() => {
             showLoader(false);
-            window.location.href = "index.html";
+            window.location.href = "./app.html"; // Redirect after data is stored
         })
         .catch(error => {
             showLoader(false);
             showError(error.message);
         });
 }
+
 
 // Sign In Function
 function signIn() {
@@ -87,7 +103,7 @@ function signIn() {
     auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
             showLoader(false);
-            window.location.href = "404.html";
+            window.location.href = "./app.html";
         })
         .catch(error => {
             showLoader(false);

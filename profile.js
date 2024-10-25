@@ -26,7 +26,7 @@ if (uid) {
         document.getElementById('profileName').innerText = userData.name;
         document.getElementById('profileSectionValue').innerText = userData.section;
         document.getElementById('profileBirthdayValue').innerText = userData.birthday;
-        document.getElementById('profilePic').src = userData.profilePicture || 'def.png';
+        document.getElementById('profilePic').src = userData.profilePicture || './img/def.png';
 
         // Set Instagram and Facebook links, if provided
         if (userData.instagram) {

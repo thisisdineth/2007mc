@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 </head>
-<body class="bg-gray-100">
+<body>
     <!-- Navbar -->
     <nav class="flex justify-between items-center p-5 bg-blue-500 text-white">
         <div class="text-lg font-semibold">MC 2026 A/L batch</div>
@@ -24,20 +24,19 @@
         <a href="#" onclick="signOut()">Sign Out</a>
         <a href="edit.html">Edit Profile</a>
     </div>
-
-    <!-- Hero Section with Profile Hover Box -->
-    <section class="flex justify-between items-center p-6 bg-white shadow-md">
-        <h1 class="text-2xl font-bold">You can find your frinds details here !</h1>
-        <div class="relative" id="profileContainer">
-            <div id="profilePic" class="w-12 h-12 rounded-full overflow-hidden cursor-pointer">
-                <img src="./img/def.png" alt="User Profile" id="userProfilePic" class="object-cover w-full h-full">
-            </div>
-            <div id="profileHover" class="profile-hover absolute hidden bg-white shadow-lg rounded-lg text-center p-2">
-                <a href="edit.html" class="block text-blue-500 hover:text-blue-700">Edit Profile</a>
-                <a href="#" onclick="signOut()" class="block text-red-500 hover:text-red-700">Sign Out</a>
-            </div>
+<!-- Hero Section with Profile Hover Box -->
+<section class="hero-section flex justify-between items-center">
+    <h1 class="text-2xl font-bold">You can find your friends' details here!</h1>
+    <div class="relative" id="profileContainer">
+        <div id="profilePic" class="w-12 h-12 rounded-full overflow-hidden cursor-pointer">
+            <img src="./img/def.png" alt="User Profile" id="userProfilePic" class="object-cover w-full h-full">
         </div>
-    </section>
+        <div id="profileHover" class="profile-hover absolute hidden bg-white shadow-lg rounded-lg text-center p-2">
+            <a href="edit.html" class="block text-blue-500 hover:text-blue-700">Edit Profile</a>
+            <a href="#" onclick="signOut()" class="block text-red-500 hover:text-red-700">Sign Out</a>
+        </div>
+    </div>
+</section>
 
     <!-- Search Bar -->
     <section class="p-6">
@@ -49,10 +48,14 @@
         <div class="loader"></div>
     </div>
 
-    <!-- User Cards Section -->
-    <section id="userCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        <!-- Cards will be populated by JavaScript -->
-    </section>
+ <!-- User Cards Section -->
+<section id="userCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    <!-- Card Example -->
+    <div class="custom-card">
+        <h2 class="text-lg font-semibold">Card Title</h2>
+        <p>Card content goes here.</p>
+    </div>
+</section>
 
     <script src="app.js"></script>
 </body>

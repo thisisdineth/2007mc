@@ -1,8 +1,24 @@
 /* Profile Picture Hover Effect */
+/* Body Background Color */
+body {
+    background-color: #987d01;
+}
 #profileHover {
     width: 100px;
     padding: 5px;
     transition: opacity 0.3s ease;
+}
+nav {
+    background-color: #393604 !important; /* Deep blue color for the header */
+    color: #ffffff; /* White text color for visibility */
+}
+
+/* Hero Section Background Color */
+.hero-section {
+    background: linear-gradient(135deg, #987d01, #020200);
+    color: #ffffff; /* White text color for contrast */
+    padding: 24px; /* Match the p-6 class */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Match the shadow-md class */
 }
 
 /* Card animation */
@@ -18,11 +34,6 @@
 /* Mobile Hamburger Menu */
 #menuBtn {
     cursor: pointer;
-}
-
-/* Hide menu on desktop */
-#menu {
-    display: none;
 }
 
 /* Show menu on small screens */

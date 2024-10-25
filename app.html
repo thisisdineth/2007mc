@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahanama College Alumni</title>
+    <link rel="stylesheet" href="./app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-storage-compat.js"></script>
+    <script defer src="app.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Mahanama College Alumni</h1>
+        <div class="menu-toggle" id="menuToggle">☰</div>
+        <nav class="sidebar" id="sidebar">
+            <ul>
+                <li><a href="./index.html">Home</a></li>
+                <li><a href="./app.html">User Profiles</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <h2>Welcome to Mahanama College Alumni Portal</h2>
+        <input type="text" id="searchInput" placeholder="Search Users..." onkeyup="filterUsers()">
+    </section>
+
+    <main id="userCardsContainer"></main>
+
+    <footer>
+        <p>&copy; 2023 Mahanama College Alumni</p>
+    </footer>
+
+    <div class="overlay" id="profileOverlay" onclick="closeProfileView()">
+        <div class="profile-view" id="profileView" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeProfileView()">&times;</span>
+            <img id="profilePic" src="" alt="Profile Picture">
+            <h3 id="profileName"></h3>
+            <p id="profileSection"></p>
+            <p id="profileBirthday"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('menuToggle').onclick = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

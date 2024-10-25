@@ -48,7 +48,7 @@ function displayUserCards() {
 // Sign Out
 function signOut() {
     auth.signOut().then(() => {
-        window.location.href = 'index.html'; // Redirect to sign-in page
+        window.location.href = './sign.html'; // Redirect to sign-in page
     }).catch(error => {
         console.error("Sign-out error:", error);
     });
@@ -62,7 +62,7 @@ auth.onAuthStateChanged(user => {
             document.getElementById('userProfilePic').src = userData.profilePicture;
         });
     } else {
-        window.location.href = 'index.html'; // Redirect if not logged in
+        window.location.href = './sign.html'; // Redirect if not logged in
     }
 });
 

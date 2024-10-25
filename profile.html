@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase App (non-modular) -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script defer src="profile.js"></script>
+</head>
+<body>
+    <div class="profile-container">
+        <img id="profilePic" src="def.png" alt="Profile Picture">
+        <h2 id="profileName">User Name</h2>
+        <p id="profileSection">Section: <span id="profileSectionValue"></span></p>
+        <p id="profileBirthday">Birthday: <span id="profileBirthdayValue"></span></p>
+        
+        <div class="social-links">
+            <a id="profileInstagram" href="#" target="_blank">
+                <i class="fab fa-instagram"></i> Instagram
+            </a>
+            <a id="profileFacebook" href="#" target="_blank">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+        </div>
+    </div>
+</body>
+</html>

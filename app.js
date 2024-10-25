@@ -44,6 +44,13 @@ function displayUserCards() {
         const userCards = document.getElementById('userCards');
         userCards.innerHTML = ''; // Clear existing cards
 
+        // Array of verified UIDs
+        const verifiedUIDs = [
+            '1pKKDxXspXaukLY115S53cO8kLV2',
+            'anotherUID1', // Replace with actual UIDs
+            'anotherUID2', // Add more UIDs as needed
+        ];
+
         Object.keys(users).forEach(uid => {
             const user = users[uid];
             const profilePicUrl = user.profilePicture || 'def.png'; // Default profile picture
@@ -51,9 +58,14 @@ function displayUserCards() {
             const card = document.createElement('div');
             card.className = 'card p-4 bg-white shadow-lg rounded-lg';
 
-            // Check if UID matches the one for verification
-            const isVerified = uid === '1pKKDxXspXaukLY115S53cO8kLV2';
-            const verificationIcon = isVerified ? '<i class="fas fa-check-circle text-blue-500 ml-1"></i>' : '';
+            // Check if UID is in the verified UIDs array
+            const isVerified = verifiedUIDs.includes(uid);
+            const verificationIcon = isVerified ? 
+                `<span class="relative inline-block">
+                    <i class="fas fa-check-circle text-blue-500 ml-1" id="verificationTick"></i>
+                    <span class="tooltip hidden absolute left-1/2 transform -translate-x-1/2 -translate-y-full mt-1 bg-gray-800 text-white text-xs rounded px-2 py-1">Verified Member</span>
+                </span>` 
+                : '';
 
             // User card content
             card.innerHTML = `
@@ -70,6 +82,7 @@ function displayUserCards() {
         loadingSpinner.classList.add('hidden'); // Hide loading spinner
     });
 }
+
 
 
 // Sign Out

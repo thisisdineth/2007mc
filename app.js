@@ -44,7 +44,6 @@ function displayUserCards() {
         const userCards = document.getElementById('userCards');
         userCards.innerHTML = ''; // Clear existing cards
 
-        // Array of verified UIDs
         const verifiedUIDs = [
             '1pKKDxXspXaukLY115S53cO8kLV2',
             'anotherUID1', // Replace with actual UIDs
@@ -54,11 +53,12 @@ function displayUserCards() {
         Object.keys(users).forEach(uid => {
             const user = users[uid];
             const profilePicUrl = user.profilePicture || 'def.png'; // Default profile picture
+            const instagramUsername = user.instagram ? `https://instagram.com/${user.instagram}` : '#';
+            const facebookUsername = user.facebook ? `https://facebook.com/${user.facebook}` : '#';
 
             const card = document.createElement('div');
             card.className = 'card p-4 bg-white shadow-lg rounded-lg';
 
-            // Check if UID is in the verified UIDs array
             const isVerified = verifiedUIDs.includes(uid);
             const verificationIcon = isVerified ? 
                 `<span class="relative inline-block">
@@ -73,6 +73,14 @@ function displayUserCards() {
                 <h3 class="text-center font-semibold mt-2">${user.name} ${verificationIcon}</h3>
                 <p class="text-center text-gray-500">${user.section}</p>
                 <p class="text-center text-sm text-gray-400">Birthday: ${user.birthday}</p>
+                <div class="text-center mt-3">
+                    <a href="${instagramUsername}" target="_blank" class="text-pink-500 hover:text-pink-600 mx-2">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="${facebookUsername}" target="_blank" class="text-blue-700 hover:text-blue-800 mx-2">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                </div>
                 <a href="profile.html?uid=${uid}" class="text-center text-blue-500 hover:text-blue-700 mt-2 block">View Profile</a>
             `;
 
@@ -82,6 +90,7 @@ function displayUserCards() {
         loadingSpinner.classList.add('hidden'); // Hide loading spinner
     });
 }
+
 
 
 

@@ -39,6 +39,12 @@ function showError(message) {
     setTimeout(() => errorDiv.style.display = 'none', 5000);
 }
 
+function isValidName(name) {
+    // Regular expression: allows letters, spaces, hyphens, and apostrophes only
+    const namePattern = /^[A-Za-z\s'-]+$/;
+    return namePattern.test(name);
+}
+
 // Validate Birthdate for Allowed Sign Up
 function isValidBirthdate() {
     const birthday = document.getElementById('birthday').value;
@@ -56,23 +62,26 @@ function isValidBirthdate() {
     }
 }
 
-// Sign Up Function
 function signUp() {
     if (!isValidBirthdate()) {
         return;  // Stop if birthdate is invalid
     }
 
-    showLoader(true);
     const name = document.getElementById('name').value;
+    if (!isValidName(name)) {
+        showError("Name can only contain letters, spaces, hyphens, and apostrophes.");
+        return;
+    }
+
+    showLoader(true);
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const fileInput = document.getElementById('profilePicture'); // Get the file input
-    const file = fileInput.files[0]; // Get the selected file
-
-    // Get the selected section studied value
+    const instagram = document.getElementById('instagram').value; // Get Instagram username
+    const facebook = document.getElementById('facebook').value;   // Get Facebook username
+    const fileInput = document.getElementById('profilePicture');
+    const file = fileInput.files[0];
     const section = document.querySelector('input[name="section"]:checked').value;
 
-    // Create user with email and password
     auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
             const user = userCredential.user;
@@ -83,20 +92,20 @@ function signUp() {
                 name: name,
                 email: email,
                 birthday: document.getElementById('birthday').value,
-                section: section // Add the section studied to user data
+                section: section,
+                instagram: instagram || null, // Store null if not provided
+                facebook: facebook || null    // Store null if not provided
             };
 
             // Store the user data in the Realtime Database
             return db.ref('users/' + user.uid).set(userData).then(() => {
                 // Now upload the profile picture to Firebase Storage
                 if (file) {
-                    const storageRef = firebase.storage().ref(); // Create a storage reference
-                    const profilePicRef = storageRef.child('profilePictures/' + user.uid + '/' + file.name); // Create a reference to the file location
+                    const storageRef = firebase.storage().ref();
+                    const profilePicRef = storageRef.child('profilePictures/' + user.uid + '/' + file.name);
 
                     return profilePicRef.put(file).then(snapshot => {
-                        // Get the download URL of the uploaded image
                         return snapshot.ref.getDownloadURL().then(downloadURL => {
-                            // Update user data with the profile picture URL
                             return db.ref('users/' + user.uid).update({
                                 profilePicture: downloadURL
                             });
@@ -114,6 +123,7 @@ function signUp() {
             showError(error.message);
         });
 }
+
 
 
 

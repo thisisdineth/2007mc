@@ -3,46 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Portal</title>
+    <title>Member Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <link rel="stylesheet" href="app.css">
-    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-storage-compat.js"></script>
-    <script defer src="app.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 </head>
-<body>
-    <header>
-        <div class="header-content">
-            <h1>Mahanama College 2007 Badge Alumni</h1>
-            <div class="user-info">
-                <img id="profilePicture" alt="Profile" />
-                <span id="userName"></span>
-                <button id="signOutBtn">Sign Out</button>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center p-5 bg-blue-500 text-white">
+        <div class="text-lg font-semibold">Member Portal</div>
+        <div class="space-x-4 hidden md:flex">
+            <a href="#" onclick="signOut()">Sign Out</a>
+            <a href="edit.html">Edit Profile</a>
+        </div>
+        <button id="menuBtn" class="block md:hidden focus:outline-none">☰</button>
+    </nav>
+
+    <!-- Hamburger Menu -->
+    <div id="menu" class="hidden flex-col items-center bg-blue-500 text-white p-4 md:hidden">
+        <a href="#" onclick="signOut()">Sign Out</a>
+        <a href="edit.html">Edit Profile</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="flex justify-between items-center p-6 bg-white shadow-md">
+        <h1 class="text-2xl font-bold">Welcome to the Member Portal</h1>
+        <div id="profilePic" class="relative w-12 h-12 rounded-full overflow-hidden">
+            <img src="" alt="User Profile" id="userProfilePic" class="object-cover w-full h-full">
+            <div id="profileHover" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-sm text-white opacity-0 hover:opacity-100 transition-opacity">
+                <a href="edit.html">Edit Profile</a>
+                <a href="#" onclick="signOut()">Sign Out</a>
             </div>
-            <div id="hamburger" class="hamburger" onclick="toggleMenu()">&#9776;</div>
         </div>
-    </header>
+    </section>
 
-    <aside id="sidebar" class="sidebar">
-        <ul>
-            <li><a href="#" onclick="loadHome()">HOME</a></li>
-            <li><a href="#" onclick="loadPortal()">PORTAL</a></li>
-            <li><a href="#" onclick="loadApps()">APPS</a></li>
-            <li><a href="#" onclick="signOut()">SIGN OUT</a></li>
-        </ul>
-    </aside>
+    <!-- User Cards Section -->
+    <section id="userCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+        <!-- Cards will be populated by JavaScript -->
+    </section>
 
-    <main class="main-content">
-        <div class="hero-section">
-            <input type="text" id="searchBar" placeholder="Search users..." onkeyup="searchUsers()" />
-        </div>
-
-        <div id="userCardsContainer" class="user-cards-container"></div>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 MCC - 2007 Badgemates only</p>
-    </footer>
+    <script src="app.js"></script>
 </body>
 </html>

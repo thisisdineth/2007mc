@@ -14,67 +14,57 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Check Authentication Status
+// Toggle Hamburger Menu
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('hidden');
+});
+
+// Fetch and Display User Cards
+function displayUserCards() {
+    db.ref('users').once('value').then(snapshot => {
+        const users = snapshot.val();
+        const userCards = document.getElementById('userCards');
+        userCards.innerHTML = ''; // Clear existing cards
+
+        Object.keys(users).forEach(uid => {
+            const user = users[uid];
+            const card = document.createElement('div');
+            card.className = 'card p-4 bg-white shadow-lg rounded-lg';
+
+            // User card content
+            card.innerHTML = `
+                <img src="${user.profilePicture}" class="w-16 h-16 rounded-full mx-auto" alt="Profile Picture">
+                <h3 class="text-center font-semibold mt-2">${user.name}</h3>
+                <p class="text-center text-gray-500">${user.section}</p>
+                <p class="text-center text-sm text-gray-400">Birthday: ${user.birthday}</p>
+            `;
+
+            userCards.appendChild(card);
+        });
+    });
+}
+
+// Sign Out
+function signOut() {
+    auth.signOut().then(() => {
+        window.location.href = 'index.html'; // Redirect to sign-in page
+    }).catch(error => {
+        console.error("Sign-out error:", error);
+    });
+}
+
+// Load Profile Picture for Current User
 auth.onAuthStateChanged(user => {
     if (user) {
-        document.getElementById('profilePicture').src = user.photoURL || 'default-profile.png'; // Set default image if none exists
-        document.getElementById('userName').innerText = user.displayName || user.email;
-        loadUsers();
+        db.ref('users/' + user.uid).once('value').then(snapshot => {
+            const userData = snapshot.val();
+            document.getElementById('userProfilePic').src = userData.profilePicture;
+        });
     } else {
-        window.location.href = "sign.html"; // Redirect to sign in page if not authenticated
+        window.location.href = 'index.html'; // Redirect if not logged in
     }
 });
 
-// Load Users Function
-function loadUsers() {
-    db.ref('users').once('value').then(snapshot => {
-        const users = snapshot.val();
-        const container = document.getElementById('userCardsContainer');
-        container.innerHTML = ''; // Clear previous users
-        for (const uid in users) {
-            const userData = users[uid];
-            const card = document.createElement('div');
-            card.classList.add('user-card');
-            card.innerHTML = `
-                <img src="${userData.profilePicture || 'default-profile.png'}" alt="${userData.name}" />
-                <h3>${userData.name}</h3>
-                <p>Section: ${userData.section}</p>
-                <p>Birthday: ${userData.birthday}</p>
-            `;
-            container.appendChild(card);
-        }
-    });
-}
-
-// Sign Out Function
-function signOut() {
-    auth.signOut().then(() => {
-        window.location.href = "sign.html"; // Redirect to sign in page after sign out
-    });
-}
-
-// Search Function
-function searchUsers() {
-    const query = document.getElementById('searchBar').value.toLowerCase();
-    const userCards = document.getElementsByClassName('user-card');
-
-    Array.from(userCards).forEach(card => {
-        const name = card.querySelector('h3').innerText.toLowerCase();
-        if (name.includes(query)) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-// Hamburger Menu Toggle
-function toggleMenu() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
-}
-
-// Placeholder functions for navigation
-function loadHome() { /* Logic to load home content */ }
-function loadPortal() { /* Logic to load portal content */ }
-function loadApps() { /* Logic to load apps content */ }
+// Display user cards when page loads
+window.onload = displayUserCards;

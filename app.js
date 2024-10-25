@@ -14,12 +14,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Toggle Hamburger Menu
-const menuBtn = document.getElementById('menuBtn');
-const menu = document.getElementById('menu');
-menuBtn.addEventListener('click', () => {
-    menu.classList.toggle('hidden');
-});
+
 
 // Profile Picture Hover Toggle
 const profilePic = document.getElementById('profilePic');

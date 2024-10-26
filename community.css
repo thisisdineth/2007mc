@@ -37,6 +37,38 @@ body {
     overflow-y: auto;
     margin-top: 10px;
 }
+/* New Message Indicator */
+#new-message-indicator {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0077b6;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: none; /* hidden by default */
+    cursor: pointer;
+}
+
+/* Message Action Buttons */
+.message-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.message-action-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.message-action-btn:hover {
+    color: rgba(255, 255, 255, 1);
+}
 
 #chat-box {
     width: 90%;

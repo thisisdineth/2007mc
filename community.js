@@ -19,6 +19,7 @@ const db = getDatabase(app);
 
 let currentUser = null;
 let typingRef = null;
+let autoScroll = true;
 
 // Sign in function (use email and password)
 function signIn(email, password) {
@@ -34,11 +35,11 @@ function fetchUserProfile(uid) {
             return snapshot.val();
         } else {
             console.error("User profile not found");
-            return { name: "Anonymous", profilePicture: "default-avatar.png" }; // Default values
+            return { name: "Anonymous", profilePicture: "default-avatar.png" };
         }
     }).catch((error) => {
         console.error("Error fetching user profile:", error);
-        return { name: "Anonymous", profilePicture: "default-avatar.png" }; // Default values in case of error
+        return { name: "Anonymous", profilePicture: "default-avatar.png" };
     });
 }
 
@@ -91,19 +92,42 @@ function listenForMessages() {
 
         snapshot.forEach((childSnapshot) => {
             const messageData = childSnapshot.val();
+            messageData.id = childSnapshot.key; // Attach message ID
             const messageDiv = createMessageElement(messageData);
             chatBox.appendChild(messageDiv);
         });
 
-        chatBox.scrollTop = chatBox.scrollHeight;
+        if (autoScroll) {
+            scrollToLatestMessage();
+        }
     });
 }
 
-// Create message elements with profile picture
+// Scroll to the latest message
+function scrollToLatestMessage() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+    autoScroll = true;
+    document.getElementById('new-message-indicator').style.display = 'none';
+}
+
+// Detect scrolling behavior
+document.getElementById('chat-box').addEventListener('scroll', () => {
+    const chatBox = document.getElementById('chat-box');
+    autoScroll = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 10;
+
+    if (!autoScroll) {
+        document.getElementById('new-message-indicator').style.display = 'block';
+    } else {
+        document.getElementById('new-message-indicator').style.display = 'none';
+    }
+});
+
+// Create message elements with actions
 function createMessageElement(messageData) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', messageData.uid === currentUser.uid ? 'you' : 'stranger');
-    
+
     const profileImg = document.createElement('img');
     profileImg.classList.add('profile-picture');
     profileImg.src = messageData.photoURL || 'default-avatar.png';
@@ -111,13 +135,73 @@ function createMessageElement(messageData) {
     const textDiv = document.createElement('span');
     textDiv.textContent = `${messageData.name || "Anonymous"}: ${messageData.message}`;
 
+    // Actions (Delete, React, Reply)
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('message-actions');
+
+    if (messageData.uid === currentUser.uid) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('message-action-btn');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteMessage(messageData.id);
+        actionsDiv.appendChild(deleteBtn);
+    }
+
+    const reactBtn = document.createElement('button');
+    reactBtn.classList.add('message-action-btn');
+    reactBtn.textContent = '👍';
+    reactBtn.onclick = () => reactToMessage(messageData.id);
+    actionsDiv.appendChild(reactBtn);
+
+    const replyBtn = document.createElement('button');
+    replyBtn.classList.add('message-action-btn');
+    replyBtn.textContent = 'Reply';
+    replyBtn.onclick = () => startReply(messageData);
+    actionsDiv.appendChild(replyBtn);
+
     messageDiv.appendChild(profileImg);
     messageDiv.appendChild(textDiv);
-    
+    messageDiv.appendChild(actionsDiv);
+
+    // Swipe-to-reply
+    messageDiv.addEventListener('touchstart', handleSwipeToReply);
+
     return messageDiv;
 }
 
-// Setup typing indicator for other users
+// Delete a message
+function deleteMessage(messageId) {
+    const messageRef = ref(db, `communityChat/messages/${messageId}`);
+    set(messageRef, null);
+}
+
+// React to a message
+function reactToMessage(messageId) {
+    const messageRef = ref(db, `communityChat/messages/${messageId}`);
+    set(ref(messageRef, 'reaction'), '👍');
+}
+
+// Start reply
+function startReply(messageData) {
+    const chatInput = document.getElementById('chat-input');
+    chatInput.value = `Replying to ${messageData.name}: "${messageData.message}" - `;
+    chatInput.focus();
+}
+
+// Swipe-to-reply functionality
+let touchStartX = 0;
+function handleSwipeToReply(event) {
+    if (event.type === 'touchstart') {
+        touchStartX = event.touches[0].clientX;
+    } else if (event.type === 'touchend') {
+        const touchEndX = event.changedTouches[0].clientX;
+        if (touchStartX - touchEndX > 50) {
+            startReply(event.currentTarget.messageData);
+        }
+    }
+}
+
+// Typing indicator
 function setupTypingListener() {
     const typingIndicatorRef = ref(db, 'communityChat/typing');
     onValue(typingIndicatorRef, (snapshot) => {

@@ -20,7 +20,7 @@ let speed = 200; // Initial speed of the snake
 let direction = 'RIGHT';
 let snake = [{ x: 9 * 32, y: 10 * 32 }];
 let food = generateFood();
-let eagle = generateEagle();
+let eagles = generateEagles(3); // Generate multiple eagles
 let obstacles = generateObstacles(5); // Generate some obstacles
 let lives = 3; // Player lives
 
@@ -32,12 +32,16 @@ function generateFood() {
     };
 }
 
-// Function to generate eagle at random positions
-function generateEagle() {
-    return {
-        x: Math.floor(Math.random() * 19) * 32,
-        y: Math.floor(Math.random() * 15) * 32
-    };
+// Function to generate multiple eagles
+function generateEagles(num) {
+    const eagles = [];
+    for (let i = 0; i < num; i++) {
+        eagles.push({
+            x: Math.floor(Math.random() * 19) * 32,
+            y: Math.floor(Math.random() * 15) * 32
+        });
+    }
+    return eagles;
 }
 
 // Function to generate obstacles
@@ -72,20 +76,20 @@ function drawGame() {
     const ctx = document.getElementById('gameCanvas').getContext('2d');
     ctx.clearRect(0, 0, 640, 480);
 
-    // Draw snake
+    // Draw snake as emoji
     snake.forEach((segment) => {
-        ctx.fillStyle = 'red'; // Red snake
-        ctx.fillRect(segment.x, segment.y, 32, 32);
-        ctx.strokeStyle = 'black';
-        ctx.strokeRect(segment.x, segment.y, 32, 32);
+        ctx.font = '32px Arial';
+        ctx.fillText('🐍', segment.x + 5, segment.y + 25);
     });
 
     // Draw food (frog emoji)
     ctx.font = '32px Arial';
     ctx.fillText('🐸', food.x + 5, food.y + 25);
 
-    // Draw eagle (eagle emoji)
-    ctx.fillText('🦅', eagle.x + 5, eagle.y + 25);
+    // Draw eagles (multiple eagle emojis)
+    eagles.forEach(eagle => {
+        ctx.fillText('🦅', eagle.x + 5, eagle.y + 25);
+    });
 
     // Draw obstacles
     ctx.fillStyle = 'black';
@@ -111,10 +115,17 @@ function moveSnake() {
     else if (direction === 'LEFT') head.x -= 32;
     else if (direction === 'RIGHT') head.x += 32;
 
+    // Wrap around edges
+    if (head.x < 0) head.x = document.getElementById('gameCanvas').width - 32;
+    else if (head.x >= document.getElementById('gameCanvas').width) head.x = 0;
+    if (head.y < 0) head.y = document.getElementById('gameCanvas').height - 32;
+    else if (head.y >= document.getElementById('gameCanvas').height) head.y = 0;
+
     // Check if snake has eaten the food
     if (head.x === food.x && head.y === food.y) {
         score += 1; // Increase score by 1
         food = generateFood(); // Generate new food
+        eagles = generateEagles(3); // Generate new eagles after eating the frog
 
         // Increase speed after every 5 points
         if (score % 5 === 0) {
@@ -139,7 +150,8 @@ function checkCollision() {
     const [head, ...body] = snake;
     return body.some(segment => segment.x === head.x && segment.y === head.y) ||
            head.x < 0 || head.x >= document.getElementById('gameCanvas').width || head.y < 0 || head.y >= document.getElementById('gameCanvas').height ||
-           obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y); // Check collision with obstacles
+           obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) || // Check collision with obstacles
+           eagles.some(eagle => eagle.x === head.x && eagle.y === head.y); // Check collision with eagles
 }
 
 // Game Over Function
@@ -161,7 +173,7 @@ function resetGame() {
     direction = 'RIGHT';
     snake = [{ x: 9 * 32, y: 10 * 32 }]; // Reset snake position
     food = generateFood(); // Regenerate food
-    eagle = generateEagle(); // Regenerate eagle
+    eagles = generateEagles(3); // Regenerate eagles
     obstacles = generateObstacles(5); // Regenerate obstacles
 }
 

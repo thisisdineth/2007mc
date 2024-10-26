@@ -16,10 +16,13 @@ const db = firebase.database();
 
 let gameStarted = false;
 let score = 0;
+let speed = 200; // Initial speed of the snake
 let direction = 'RIGHT';
 let snake = [{ x: 9 * 32, y: 10 * 32 }];
 let food = generateFood();
 let eagle = generateEagle();
+let obstacles = generateObstacles(5); // Generate some obstacles
+let lives = 3; // Player lives
 
 // Function to generate food at random positions
 function generateFood() {
@@ -37,6 +40,18 @@ function generateEagle() {
     };
 }
 
+// Function to generate obstacles
+function generateObstacles(num) {
+    const obstacles = [];
+    for (let i = 0; i < num; i++) {
+        obstacles.push({
+            x: Math.floor(Math.random() * 19) * 32,
+            y: Math.floor(Math.random() * 15) * 32
+        });
+    }
+    return obstacles;
+}
+
 // Start Game Function
 document.getElementById('startGameButton').addEventListener('click', startGame);
 
@@ -44,6 +59,8 @@ function startGame() {
     if (gameStarted) return;
     gameStarted = true;
     score = 0; // Reset score
+    speed = 200; // Reset speed
+    lives = 3; // Reset lives
     snake = [{ x: 9 * 32, y: 10 * 32 }];
     direction = 'RIGHT'; // Reset direction
     document.getElementById('startGameButton').style.display = 'none';
@@ -56,7 +73,7 @@ function drawGame() {
     ctx.clearRect(0, 0, 640, 480);
 
     // Draw snake
-    snake.forEach((segment, index) => {
+    snake.forEach((segment) => {
         ctx.fillStyle = 'red'; // Red snake
         ctx.fillRect(segment.x, segment.y, 32, 32);
         ctx.strokeStyle = 'black';
@@ -70,13 +87,19 @@ function drawGame() {
     // Draw eagle (eagle emoji)
     ctx.fillText('🦅', eagle.x + 5, eagle.y + 25);
 
+    // Draw obstacles
+    ctx.fillStyle = 'black';
+    obstacles.forEach(obstacle => {
+        ctx.fillRect(obstacle.x, obstacle.y, 32, 32);
+    });
+
     // Move snake
     moveSnake();
 
     if (checkCollision()) {
         gameOver();
     } else {
-        setTimeout(drawGame, 100);
+        setTimeout(drawGame, speed); // Adjust speed
     }
 }
 
@@ -92,15 +115,15 @@ function moveSnake() {
     if (head.x === food.x && head.y === food.y) {
         score += 1; // Increase score by 1
         food = generateFood(); // Generate new food
+
+        // Increase speed after every 5 points
+        if (score % 5 === 0) {
+            speed = Math.max(100, speed - 10); // Increase speed but not below 100ms
+        }
         snake.unshift(head); // Add new head
     } else {
-        // Check if snake has touched the eagle
-        if (head.x === eagle.x && head.y === eagle.y) {
-            gameOver(); // Game over if touching eagle
-        } else {
-            snake.pop(); // Remove the last segment
-            snake.unshift(head); // Add new head
-        }
+        snake.pop(); // Remove the last segment
+        snake.unshift(head); // Add new head
     }
 
     updateScore();
@@ -108,45 +131,56 @@ function moveSnake() {
 
 // Update Score Display
 function updateScore() {
-    document.getElementById('currentScore').innerText = `Score: ${score}`;
+    document.getElementById('currentScore').innerText = `Score: ${score} | Lives: ${lives}`;
 }
 
 // Check Collision Function
 function checkCollision() {
     const [head, ...body] = snake;
     return body.some(segment => segment.x === head.x && segment.y === head.y) ||
-           head.x < 0 || head.x >= document.getElementById('gameCanvas').width || head.y < 0 || head.y >= document.getElementById('gameCanvas').height;
+           head.x < 0 || head.x >= document.getElementById('gameCanvas').width || head.y < 0 || head.y >= document.getElementById('gameCanvas').height ||
+           obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y); // Check collision with obstacles
 }
 
 // Game Over Function
 function gameOver() {
-    alert(`Game Over! Your score: ${score}`);
-    gameStarted = false;
-    document.getElementById('startGameButton').style.display = 'block';
-    saveScore();
+    lives--; // Reduce lives
+    if (lives > 0) {
+        alert(`You lost a life! Lives left: ${lives}`);
+        resetGame(); // Reset game
+    } else {
+        alert(`Game Over! Your score: ${score}`);
+        gameStarted = false;
+        document.getElementById('startGameButton').style.display = 'block';
+        saveScore();
+    }
+}
+
+// Reset Game Function
+function resetGame() {
+    direction = 'RIGHT';
+    snake = [{ x: 9 * 32, y: 10 * 32 }]; // Reset snake position
+    food = generateFood(); // Regenerate food
+    eagle = generateEagle(); // Regenerate eagle
+    obstacles = generateObstacles(5); // Regenerate obstacles
 }
 
 // Save Score Function
 function saveScore() {
     const user = firebase.auth().currentUser;
     if (user) {
-        // Use the uid to fetch user details from the users database
-        db.ref('users/' + user.uid).once('value').then(userSnapshot => {
-            const userData = userSnapshot.val();
-            if (userData) {
-                const { name, profilePicture } = userData; // Fetching name and profile picture
+        // Check if this score is higher than the previously stored score
+        db.ref('scores/' + user.uid).once('value').then(snapshot => {
+            const previousScore = snapshot.val() ? snapshot.val().score : 0;
+            if (score > previousScore) {
                 db.ref('scores/' + user.uid).set({
-                    name: name || 'Anonymous',
+                    name: user.displayName || user.email,
                     score: score,
-                    profilePicture: profilePicture || 'default_profile_pic.png'
-                }).then(() => {
-                    loadScores(); // Load scores after saving
-                }).catch(error => {
-                    console.error("Error saving score: ", error);
+                    profilePicture: user.photoURL || 'default_profile_pic.png',
+                    uid: user.uid // Store UID
                 });
+                loadScores(); // Load scores after saving
             }
-        }).catch(error => {
-            console.error("Error fetching user data: ", error);
         });
     }
 }
@@ -159,8 +193,6 @@ function loadScores() {
             scores.push(childSnapshot.val());
         });
         displayScores(scores.reverse()); // Display from highest to lowest
-    }).catch(error => {
-        console.error("Error loading scores: ", error);
     });
 }
 
@@ -169,15 +201,41 @@ function displayScores(scores) {
     const tbody = document.querySelector('#scoreTable tbody');
     tbody.innerHTML = '';
 
-    scores.forEach((score, index) => {
-        const badge = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
-        const row = `<tr>
-            <td>${index + 1}</td>
-            <td>${badge} ${score.name}</td>
-            <td>${score.score}</td>
-            <td><img src="${score.profilePicture}" alt="Profile" width="30" height="30"></td>
-        </tr>`;
-        tbody.innerHTML += row;
+    // Fetch user data for each score
+    const userPromises = scores.map(score => {
+        return db.ref('users/' + score.uid).once('value').then(userSnapshot => {
+            const userData = userSnapshot.val();
+            if (userData) {
+                return {
+                    ...score,
+                    name: userData.name, // Access name from user data
+                    profilePicture: userData.profilePicture // Access profile picture from user data
+                };
+            } else {
+                console.error(`No user data found for UID: ${score.uid}`);
+                return {
+                    ...score,
+                    name: 'Anonymous', // Fallback name if no data found
+                    profilePicture: 'default_profile_pic.png' // Fallback picture if no data found
+                };
+            }
+        });
+    });
+
+    // Wait for all user data to be retrieved
+    Promise.all(userPromises).then(fullScores => {
+        fullScores.forEach((score, index) => {
+            const badge = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+            const row = `<tr>
+                <td>${index + 1}</td>
+                <td>${badge} ${score.name}</td>
+                <td>${score.score}</td>
+                <td><img src="${score.profilePicture}" alt="Profile" width="30" height="30"></td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }).catch(error => {
+        console.error("Error loading user data: ", error);
     });
 }
 

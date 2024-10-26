@@ -3,51 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <link rel="stylesheet" href="edit.css">
+    <title>Edit Profile | 2026 A/L MC</title>
+    <link rel="stylesheet" href="sign.css">
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-storage-compat.js"></script>
+    <script defer src="./edit.js"></script>
 </head>
 <body>
-    <div id="loader" class="hidden">Updating...</div>
+    <header>
+        <h1>Edit Profile</h1>
+    </header>
+    <div class="container">
+        <div id="loader" style="display: none;"></div>
+        <div id="error-message" style="display: none;"></div>
 
-    <div class="edit-container">
-        <h2>Edit Profile</h2>
-        <div class="profile-pic-container">
-            <img id="profilePicturePreview" src="default.png" alt="Profile Picture" class="profile-pic">
-            <input type="file" id="profilePicture" accept="image/*">
-            <small>Max file size: 2MB</small>
+        <div id="edit-profile-form">
+            <h2>Your Profile</h2>
+            <img id="profileImage" src="" alt="Profile Picture" style="width: 100px; border-radius: 50%;" />
+            <div class="form-group"><input type="file" id="newProfilePicture" accept="image/*" /></div>
+
+            <div class="form-group"><input type="text" id="email" placeholder="Email"></div>
+            <div class="form-group"><input type="text" id="name" placeholder="Full Name" disabled></div>
+            <div class="form-group"><input type="text" id="schoolID" placeholder="School ID" disabled /></div>
+            <div class="form-group"><input type="date" id="birthday" placeholder="Birthday" disabled /></div>
+            <fieldset>
+                <legend>Section Studied</legend>
+                <input type="text" id="section" disabled />
+            </fieldset>
+            <div class="form-group"><input type="text" id="instagram" placeholder="Instagram Username" /></div>
+            <div class="form-group"><input type="text" id="facebook" placeholder="Facebook Username" /></div>
+            <button onclick="updateProfile()">Update Profile</button>
+            <button onclick="deleteProfile()">Delete Profile</button>
         </div>
-
-        <form id="editForm">
-            <label for="name">Name (Read-only)</label>
-            <input type="text" id="name" disabled>
-
-            <label for="birthday">Birthday (Read-only)</label>
-            <input type="date" id="birthday" disabled>
-
-            <label for="section">Section (One-time editable)</label>
-            <select id="section">
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-            </select>
-
-            <label for="instagram">Instagram Username</label>
-            <input type="text" id="instagram" placeholder="Instagram username">
-
-            <label for="facebook">Facebook Username</label>
-            <input type="text" id="facebook" placeholder="Facebook username">
-
-            <button type="submit">Update Profile</button>
-            <button type="button" id="deleteProfileBtn">Delete Profile</button>
-        </form>
-
-        <div id="error-message" class="hidden"></div>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js"></script>
-    <script src="edit.js"></script>
+    <footer>
+        <p>&copy; 2024 MCC - 2007 Badge</p>
+    </footer>
 </body>
 </html>

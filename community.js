@@ -19,7 +19,7 @@ const db = getDatabase(app);
 
 let currentUser = null;
 let typingRef = null;
-let autoScroll = true;
+
 
 // Sign in function (use email and password)
 function signIn(email, password) {
@@ -97,31 +97,9 @@ function listenForMessages() {
             chatBox.appendChild(messageDiv);
         });
 
-        if (autoScroll) {
-            scrollToLatestMessage();
-        }
     });
 }
 
-// Scroll to the latest message
-function scrollToLatestMessage() {
-    const chatBox = document.getElementById('chat-box');
-    chatBox.scrollTop = chatBox.scrollHeight;
-    autoScroll = true;
-    document.getElementById('new-message-indicator').style.display = 'none';
-}
-
-// Detect scrolling behavior
-document.getElementById('chat-box').addEventListener('scroll', () => {
-    const chatBox = document.getElementById('chat-box');
-    autoScroll = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 10;
-
-    if (!autoScroll) {
-        document.getElementById('new-message-indicator').style.display = 'block';
-    } else {
-        document.getElementById('new-message-indicator').style.display = 'none';
-    }
-});
 
 // Create message elements with actions
 function createMessageElement(messageData) {
@@ -147,17 +125,7 @@ function createMessageElement(messageData) {
         actionsDiv.appendChild(deleteBtn);
     }
 
-    const reactBtn = document.createElement('button');
-    reactBtn.classList.add('message-action-btn');
-    reactBtn.textContent = '👍';
-    reactBtn.onclick = () => reactToMessage(messageData.id);
-    actionsDiv.appendChild(reactBtn);
 
-    const replyBtn = document.createElement('button');
-    replyBtn.classList.add('message-action-btn');
-    replyBtn.textContent = 'Reply';
-    replyBtn.onclick = () => startReply(messageData);
-    actionsDiv.appendChild(replyBtn);
 
     messageDiv.appendChild(profileImg);
     messageDiv.appendChild(textDiv);
@@ -204,10 +172,19 @@ function handleSwipeToReply(event) {
 // Typing indicator
 function setupTypingListener() {
     const typingIndicatorRef = ref(db, 'communityChat/typing');
+    console.log("Listening for typing data...");
+    
     onValue(typingIndicatorRef, (snapshot) => {
         const typingData = snapshot.val();
+        console.log("Typing data received:", typingData);
+        
         const typingIndicator = document.getElementById('typing-indicator');
-        if (typingData && typingData.uid !== currentUser.uid) {
+        if (!typingIndicator) {
+            console.error("Typing indicator element not found!");
+            return; // Exit if the element does not exist
+        }
+
+        if (typingData && typingData.uid && typingData.uid !== currentUser .uid) {
             typingIndicator.textContent = `${typingData.name || "Someone"} is typing...`;
         } else {
             typingIndicator.textContent = "";

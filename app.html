@@ -16,6 +16,28 @@
 </head>
 
 <body>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <a href="#">About</a>
+    <a href="#">Services</a>
+    <a href="#">Clients</a>
+    <a href="#">Contact</a>
+  </div>
+    
+  <script>
+function openNav() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    menuToggle.classList.toggle('active');
+    // Add your existing code to open the navigation here
+
+    document.getElementById("mySidenav").style.width = "250px";
+  }
+  
+  function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+  }
+  </script>
 <!-- Hero Section with Profile Hover Box -->
 <section class="hero-section flex justify-between items-center">
     <h1 class="text-2xl font-bold">2K26 A/L All Brothers</h1>
@@ -28,6 +50,10 @@
             <a href="#" onclick="signOut()" class="block text-red-500 hover:text-red-700">Sign Out</a>
         </div>
     </div>
+    <!--menu bar-->
+    <span class="menu-toggle" onclick="openNav()">
+        <i class="fa fa-bars" aria-hidden="true"></i> 
+    </span>
 </section>
 
     <!-- Search Bar -->

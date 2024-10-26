@@ -1,4 +1,4 @@
-// Initialize Firebase (your configuration)
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
     authDomain: "mc2007-48ecf.firebaseapp.com",
@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.database();
 
 let gameStarted = false;
@@ -129,13 +130,63 @@ function gameOver() {
 function saveScore() {
     const user = firebase.auth().currentUser;
     if (user) {
-        db.ref('scores/' + user.uid).set({
-            name: user.displayName || user.email,
-            score: score,
-            profilePicture: user.photoURL || 'default_profile_pic.png'
+        // Use the uid to fetch user details from the users database
+        db.ref('users/' + user.uid).once('value').then(userSnapshot => {
+            const userData = userSnapshot.val();
+            if (userData) {
+                const { name, profilePicture } = userData; // Fetching name and profile picture
+                db.ref('scores/' + user.uid).set({
+                    name: name || 'Anonymous',
+                    score: score,
+                    profilePicture: profilePicture || 'default_profile_pic.png'
+                }).then(() => {
+                    loadScores(); // Load scores after saving
+                }).catch(error => {
+                    console.error("Error saving score: ", error);
+                });
+            }
+        }).catch(error => {
+            console.error("Error fetching user data: ", error);
         });
     }
 }
+
+// Fetch and display scores
+function loadScores() {
+    db.ref('scores').orderByChild('score').limitToLast(10).once('value').then(snapshot => {
+        const scores = [];
+        snapshot.forEach(childSnapshot => {
+            scores.push(childSnapshot.val());
+        });
+        displayScores(scores.reverse()); // Display from highest to lowest
+    }).catch(error => {
+        console.error("Error loading scores: ", error);
+    });
+}
+
+// Display scores in the scoreboard
+function displayScores(scores) {
+    const tbody = document.querySelector('#scoreTable tbody');
+    tbody.innerHTML = '';
+
+    scores.forEach((score, index) => {
+        const badge = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+        const row = `<tr>
+            <td>${index + 1}</td>
+            <td>${badge} ${score.name}</td>
+            <td>${score.score}</td>
+            <td><img src="${score.profilePicture}" alt="Profile" width="30" height="30"></td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+}
+
+// Call loadScores() after the user signs in to update the scoreboard
+firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+        loadScores();
+    }
+});
 
 // Control the snake with arrow keys
 document.addEventListener('keydown', (event) => {

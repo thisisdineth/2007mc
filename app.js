@@ -41,7 +41,7 @@ function displayUserCards() {
     db.ref('users').once('value').then(snapshot => {
         const users = snapshot.val();
         const userCards = document.getElementById('userCards');
-        userCards.innerHTML = '';
+        userCards.innerHTML = ''; // Clear the current cards
 
         const verifiedUIDs = [
             '1pKKDxXspXaukLY115S53cO8kLV2',
@@ -49,11 +49,22 @@ function displayUserCards() {
             'anotherUID2'
         ];
 
-        Object.keys(users).forEach(uid => {
-            const user = users[uid];
-            const profilePicUrl = user.profilePicture || 'def.png';
-            const instagramUsername = user.instagram ? `https://instagram.com/${user.instagram}` : '#';
-            const facebookUsername = user.facebook ? `https://facebook.com/${user.facebook}` : '#';
+        // Convert users object to array
+        const userArray = Object.keys(users).map(uid => ({ uid, ...users[uid] }));
+
+        // Shuffle function for random ordering
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        shuffleArray(userArray); // Shuffle user array
+
+        userArray.forEach(({ uid, name, profilePicture, section, birthday, instagram, facebook }) => {
+            const profilePicUrl = profilePicture || 'def.png';
+            const instagramUsername = instagram ? `https://instagram.com/${instagram}` : '#';
+            const facebookUsername = facebook ? `https://facebook.com/${facebook}` : '#';
 
             const card = document.createElement('div');
             card.className = 'card p-4 bg-white shadow-lg rounded-lg';
@@ -68,12 +79,12 @@ function displayUserCards() {
 
             card.innerHTML = `
                 <img src="${profilePicUrl}" class="w-16 h-16 rounded-full mx-auto" alt="Profile Picture">
-                <h3 class="text-center font-semibold mt-2">${user.name} ${verificationIcon}</h3>
-                <p class="text-center text-gray-500">${user.section}</p>
-                <p class="text-center text-sm text-gray-400">Birthday: ${user.birthday}</p>
+                <h3 class="text-center font-semibold mt-2">${name} ${verificationIcon}</h3>
+                <p class="text-center text-gray-500">${section}</p>
+                <p class="text-center text-sm text-gray-400">Birthday: ${birthday}</p>
                 <div class="text-center mt-3">
-                    ${user.instagram ? `<a href="${instagramUsername}" target="_blank" class="text-pink-500 hover:text-pink-600 mx-2"><i class="fab fa-instagram"></i></a>` : ''}
-                    ${user.facebook ? `<a href="${facebookUsername}" target="_blank" class="text-blue-700 hover:text-blue-800 mx-2"><i class="fab fa-facebook"></i></a>` : ''}
+                    ${instagram ? `<a href="${instagramUsername}" target="_blank" class="text-pink-500 hover:text-pink-600 mx-2"><i class="fab fa-instagram"></i></a>` : ''}
+                    ${facebook ? `<a href="${facebookUsername}" target="_blank" class="text-blue-700 hover:text-blue-800 mx-2"><i class="fab fa-facebook"></i></a>` : ''}
                 </div>
                 <a href="profile.html?uid=${uid}" class="text-center text-blue-500 hover:text-blue-700 mt-2 block">View Profile</a>
             `;
@@ -84,6 +95,8 @@ function displayUserCards() {
         loadingSpinner.classList.add('hidden');
     });
 }
+
+
 
 // Sign Out
 function signOut() {

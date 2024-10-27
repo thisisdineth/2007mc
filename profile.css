@@ -5,19 +5,36 @@ body {
     align-items: center;
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background: linear-gradient(135deg, #ead781, #ececae);
 }
 
 /* Navbar Styling */
+/* Base Styles for Navbar */
 .navbar {
-    width: 100%;
-    padding: 15px;
+    width: 100%; /* Full width of the viewport */
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #333;
-    color: #fff;
+    justify-content: space-between; /* Space items evenly */
+    background: linear-gradient(135deg, #987d01, #020200);
+    padding: 10px 20px; /* Padding around navbar items */
+    box-sizing: border-box; /* Include padding in the width */
+    overflow: hidden; /* Prevent horizontal scroll */
 }
+
+/* Navbar Links */
+.navbar a {
+    color: white; /* Text color */
+    text-decoration: none; /* Remove underline */
+    padding: 10px; /* Space around links */
+    font-size: 18px; /* Font size */
+    transition: color 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for links */
+.navbar a:hover {
+    color: #f0a500; /* Change color on hover */
+}
+
 
 .navbar .logo {
     font-size: 24px;
@@ -28,17 +45,13 @@ body {
     list-style: none;
     display: flex;
     gap: 15px;
+    padding: 5px;
 }
 
 .nav-links li {
     margin: 0;
 }
 
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-}
 
 .hamburger {
     display: none;
@@ -50,22 +63,31 @@ body {
 .nav-links.active {
     display: block;
     position: absolute;
-    top: 60px;
+    top: 0; /* Position at the top of the viewport */
     left: 0;
     width: 100%;
     background-color: #333;
     padding: 15px 0;
+    z-index: 1000; /* Ensures it appears on top of all content */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Adds shadow for better separation */
 }
 
 @media (max-width: 768px) {
     .nav-links {
-        display: none;
-        flex-direction: column;
+        display: none; /* Hidden by default on mobile */
+        flex-direction: column; /* Stack links vertically */
     }
 
     .hamburger {
-        display: block;
+        display: block; /* Show hamburger icon on mobile */
     }
+}
+
+/* Hamburger Styles */
+.hamburger {
+    cursor: pointer;
+    color: white;
+    font-size: 24px;
 }
 
 /* Profile Section Styling */
@@ -135,57 +157,128 @@ body {
 .social-links a:hover {
     color: #007bff;
 }
-/* Comment Section Styling */
-.comment-section {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
+/* General layout */
+.comments-container {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.comment-section h3 {
-    margin-bottom: 10px;
-    font-size: 20px;
-    color: #333;
-}
-
-#commentsList {
-    list-style: none;
+.comments-list {
+    list-style-type: none;
     padding: 0;
+    margin: 0;
 }
 
-#commentsList li {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #fff;
+/* Comment item styling */
+.comments-list li {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.comments-list li:hover {
+    background-color: #f9f9f9;
+}
+
+/* Author and text */
+.comment-author {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 5px; /* Adds space between author and text */
+}
+
+.comment-text {
+    color: #555;
+    line-height: 1.4;
+    font-size: 15px;
+}
+
+/* Delete button */
+.comments-list button {
+    background: #e63946;
+    color: white;
+    border: none;
+    padding: 5px 10px;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
-#commentForm {
+.comments-list button:hover {
+    opacity: 1;
+}
+
+/* Comment form */
+.comment-form {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-#commentText {
+.comment-form textarea {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+    height: 60px;
+    padding: 10px;
     border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: none;
+    font-size: 15px;
+    color: #333;
+    outline: none;
 }
 
-#commentForm button {
+.comment-form textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.comment-form button {
     align-self: flex-end;
-    padding: 8px 16px;
     background-color: #007bff;
-    color: #fff;
+    color: white;
+    padding: 8px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-#commentForm button:hover {
+.comment-form button:hover {
     background-color: #0056b3;
+}
+
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .comments-container {
+        padding: 15px;
+    }
+
+    .comments-list li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .comments-list button {
+        right: 5px;
+        top: 5px;
+    }
 }

@@ -17,9 +17,7 @@
     <nav class="navbar">
         <h1 class="logo">MC 2007</h1>
         <ul class="nav-links" id="navLinks">
-            <li><a href="home.html">Home</a></li>
-            <li><a href="profile.html">Profile</a></li>
-            <li><a href="game.html">Game</a></li>
+            <li><a href="./app.html">Go Back to Home</a></li>
         </ul>
         <div class="hamburger" onclick="toggleNav()">
             <i class="fas fa-bars"></i>
@@ -44,17 +42,18 @@
             </a>
         </div>
     </div>
- 
-    <!-- Comment Section -->
-    <div class="comment-section">
-        <h3>Comments</h3>
-        <ul id="commentsList"></ul> <!-- List of existing comments -->
 
-        <form id="commentForm">
+ <h1>Add some note on your friends profile</h1>
+
+    <div class="comments-container">
+        
+        <form id="commentForm" class="comment-form">
             <textarea id="commentText" placeholder="Write a comment..." required></textarea>
             <button type="submit">Post Comment</button>
         </form>
+        <ul id="commentsList" class="comments-list"></ul>
     </div>
+    
 </div>
 
     <script>

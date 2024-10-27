@@ -65,10 +65,10 @@ function displayUserCards() {
             const profilePicUrl = profilePicture || './img/def.png';
             const instagramUsername = instagram ? `https://instagram.com/${instagram}` : '#';
             const facebookUsername = facebook ? `https://facebook.com/${facebook}` : '#';
-
+        
             const card = document.createElement('div');
             card.className = 'card p-4 bg-white shadow-lg rounded-lg';
-
+        
             const isVerified = verifiedUIDs.includes(uid);
             const verificationIcon = isVerified ? 
                 `<span class="relative inline-block">
@@ -76,7 +76,7 @@ function displayUserCards() {
                     <span class="tooltip hidden absolute left-1/2 transform -translate-x-1/2 -translate-y-full mt-1 bg-gray-800 text-white text-xs rounded px-2 py-1">Verified</span>
                 </span>` 
                 : '';
-
+        
             card.innerHTML = `
                 <img src="${profilePicUrl}" class="w-16 h-16 rounded-full mx-auto" alt="Profile Picture">
                 <h3 class="text-center font-semibold mt-2">${name} ${verificationIcon}</h3>
@@ -87,10 +87,12 @@ function displayUserCards() {
                     ${facebook ? `<a href="${facebookUsername}" target="_blank" class="text-blue-700 hover:text-blue-800 mx-2"><i class="fab fa-facebook"></i></a>` : ''}
                 </div>
                 <a href="profile.html?uid=${uid}" class="text-center text-blue-500 hover:text-blue-700 mt-2 block">View Profile</a>
+                <a href="inbox.html?uid=${uid}" class="text-center text-green-500 hover:text-green-700 mt-2 block">Message</a>
             `;
-
+        
             userCards.appendChild(card);
         });
+        
 
         loadingSpinner.classList.add('hidden');
     });

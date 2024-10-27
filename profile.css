@@ -70,15 +70,13 @@ body {
 
 /* Profile Section Styling */
 .profile-container {
-    background-color: #fff;
-    padding: 20px;
+    padding: 0px;
     width: 100%;
-    max-width: 400px;
+    max-width: 100%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
     text-align: center;
     position: relative;
-    margin-top: 20px;
+    margin-top: 0px;
 }
 
 /* Banner and Profile Image Styling */

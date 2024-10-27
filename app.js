@@ -44,7 +44,7 @@ function displayUserCards() {
         userCards.innerHTML = ''; // Clear the current cards
 
         const verifiedUIDs = [
-            '1pKKDxXspXaukLY115S53cO8kLV2',
+            'jdBwmNdYPVSs3UNRkHOEiYtBGM72',
             'anotherUID1',
             'anotherUID2'
         ];

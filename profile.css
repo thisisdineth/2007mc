@@ -63,6 +63,7 @@ body {
 .nav-links.active {
     display: block;
     position: absolute;
+    margin-top: 80px;
     top: 0; /* Position at the top of the viewport */
     left: 0;
     width: 100%;
@@ -231,6 +232,7 @@ body {
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    padding: 5px;
 }
 
 .comment-form textarea {

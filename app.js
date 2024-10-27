@@ -62,7 +62,7 @@ function displayUserCards() {
         shuffleArray(userArray); // Shuffle user array
 
         userArray.forEach(({ uid, name, profilePicture, section, birthday, instagram, facebook }) => {
-            const profilePicUrl = profilePicture || 'def.png';
+            const profilePicUrl = profilePicture || './img/def.png';
             const instagramUsername = instagram ? `https://instagram.com/${instagram}` : '#';
             const facebookUsername = facebook ? `https://facebook.com/${facebook}` : '#';
 

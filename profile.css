@@ -77,6 +77,8 @@ body {
     text-align: center;
     position: relative;
     margin-top: 0px;
+    height: 400px;
+    max-height: 400px;
 }
 
 /* Banner and Profile Image Styling */
@@ -132,4 +134,58 @@ body {
 
 .social-links a:hover {
     color: #007bff;
+}
+/* Comment Section Styling */
+.comment-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.comment-section h3 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #333;
+}
+
+#commentsList {
+    list-style: none;
+    padding: 0;
+}
+
+#commentsList li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#commentForm {
+    display: flex;
+    flex-direction: column;
+}
+
+#commentText {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+#commentForm button {
+    align-self: flex-end;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#commentForm button:hover {
+    background-color: #0056b3;
 }

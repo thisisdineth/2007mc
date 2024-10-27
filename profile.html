@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+
     <script defer src="profile.js"></script>
 </head>
 <body>
@@ -42,6 +44,18 @@
             </a>
         </div>
     </div>
+ 
+    <!-- Comment Section -->
+    <div class="comment-section">
+        <h3>Comments</h3>
+        <ul id="commentsList"></ul> <!-- List of existing comments -->
+
+        <form id="commentForm">
+            <textarea id="commentText" placeholder="Write a comment..." required></textarea>
+            <button type="submit">Post Comment</button>
+        </form>
+    </div>
+</div>
 
     <script>
         function toggleNav() {

@@ -19,7 +19,7 @@ const db = getDatabase(app);
 
 let currentUser = null;
 let typingRef = null;
-
+let typingTimeout; // Declare typingTimeout at the top level
 
 // Sign in function (use email and password)
 function signIn(email, password) {
@@ -65,6 +65,7 @@ function setupCommunityChat() {
 
 // Mark user as active in the database
 function setUserOnline() {
+    if (!currentUser) return;
     const userRef = ref(db, `activeUsers/${currentUser.uid}`);
     set(userRef, { 
         uid: currentUser.uid, 
@@ -96,10 +97,8 @@ function listenForMessages() {
             const messageDiv = createMessageElement(messageData);
             chatBox.appendChild(messageDiv);
         });
-
     });
 }
-
 
 // Create message elements with actions
 function createMessageElement(messageData) {
@@ -124,8 +123,6 @@ function createMessageElement(messageData) {
         deleteBtn.onclick = () => deleteMessage(messageData.id);
         actionsDiv.appendChild(deleteBtn);
     }
-
-
 
     messageDiv.appendChild(profileImg);
     messageDiv.appendChild(textDiv);
@@ -184,7 +181,7 @@ function setupTypingListener() {
             return; // Exit if the element does not exist
         }
 
-        if (typingData && typingData.uid && typingData.uid !== currentUser .uid) {
+        if (typingData && typingData.uid && typingData.uid !== currentUser?.uid) {
             typingIndicator.textContent = `${typingData.name || "Someone"} is typing...`;
         } else {
             typingIndicator.textContent = "";
@@ -194,6 +191,8 @@ function setupTypingListener() {
 
 // Send a message
 function sendMessage() {
+    if (!currentUser) return; // Ensure currentUser is set before sending a message
+
     const messageInput = document.getElementById('chat-input');
     const message = messageInput.value;
     if (!message.trim()) return;
@@ -213,8 +212,13 @@ function sendMessage() {
 
 // Handle typing indicator updates
 function handleTyping() {
+    if (!currentUser) return; // Ensure currentUser is set before proceeding
+    clearTimeout(typingTimeout);
+
     typingRef = ref(db, 'communityChat/typing');
     set(typingRef, { uid: currentUser.uid, name: currentUser.displayName, timestamp: serverTimestamp() });
+
+    typingTimeout = setTimeout(clearTypingStatus, 2000); // Clear typing after 2s of inactivity
 }
 
 function clearTypingStatus() {

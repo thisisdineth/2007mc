@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Chat</title>
+    <link rel="stylesheet" href="community.css">
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.1.0/firebase-storage-compat.js"></script>
+    <script defer src="community.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Community Chat</h1>
+        <button onclick="signOut()">Sign Out</button>
+    </header>
+
+    <main>
+        <section id="chat-box"></section>
+        <form id="message-form">
+            <input type="text" id="message-input" placeholder="Type your message here..." required>
+            <input type="file" id="image-upload" accept="image/*">
+            <button type="submit">Send</button>
+        </form>
+    </main>
+</body>
+</html>

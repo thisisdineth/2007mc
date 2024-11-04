@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+</head>
+<body>
+    <h1 class="text-2xl font-bold text-center my-4">Chat Users</h1>
+    <div id="userList" class="flex flex-col items-center space-y-2 p-4"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
+    authDomain: "mc2007-48ecf.firebaseapp.com",
+    projectId: "mc2007-48ecf",
+    storageBucket: "mc2007-48ecf.appspot.com",
+    messagingSenderId: "636819382403",
+    appId: "1:636819382403:web:e5465f37c94df79409bbb6",
+    measurementId: "G-CZ57NENM1Z"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Load users that the current user has chatted with
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                const userList = document.getElementById('userList');
+                db.ref(`chats/${user.uid}`).on('value', snapshot => {
+                    userList.innerHTML = '';
+                    snapshot.forEach(childSnapshot => {
+                        const otherUserUID = childSnapshot.key;
+                        db.ref(`users/${otherUserUID}`).once('value').then(userSnapshot => {
+                            const otherUser = userSnapshot.val();
+                            const userDiv = document.createElement('div');
+                            userDiv.className = "user-item p-2 bg-gray-200 rounded cursor-pointer";
+                            userDiv.innerHTML = `
+                                <p><strong>${otherUser.name}</strong></p>
+                                <button onclick="openChat('${otherUserUID}')">Chat</button>
+                            `;
+                            userList.appendChild(userDiv);
+                        });
+                    });
+                });
+            } else {
+                window.location.href = 'sign.html';
+            }
+        });
+
+        function openChat(otherUserUID) {
+            window.location.href = `inbox.html?uid=${otherUserUID}`;
+        }
+    </script>
+</body>
+</html>

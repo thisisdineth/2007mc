@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Inbox</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+</head>
+<body>
+    <div class="flex h-screen">
+        <!-- Left Sidebar for Users -->
+        <div class="w-1/3 bg-gray-100 p-4" id="userListSidebar"></div>
+        
+        <!-- Right Chat Box -->
+        <div class="flex flex-col w-2/3 p-4">
+            <div id="chatMessages" class="flex-1 overflow-y-auto bg-white p-4 rounded shadow-inner"></div>
+            <input type="text" id="messageInput" placeholder="Type your message..." class="border border-gray-300 p-2 mt-4 rounded w-full">
+            <button onclick="sendMessage()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Send</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
+    authDomain: "mc2007-48ecf.firebaseapp.com",
+    projectId: "mc2007-48ecf",
+    storageBucket: "mc2007-48ecf.appspot.com",
+    messagingSenderId: "636819382403",
+    appId: "1:636819382403:web:e5465f37c94df79409bbb6",
+    measurementId: "G-CZ57NENM1Z"
+};
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const otherUserUID = urlParams.get('uid');
+        
+        let currentUser;
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                loadChatMessages();
+                loadUserList();
+            } else {
+                window.location.href = 'sign.html';
+            }
+        });
+
+        function loadChatMessages() {
+            db.ref(`chats/${currentUser.uid}/${otherUserUID}`).on('child_added', snapshot => {
+                const messageData = snapshot.val();
+                const messageDiv = document.createElement('div');
+                messageDiv.className = messageData.senderUID === currentUser.uid ? 'text-right bg-blue-200 p-2 rounded mb-2' : 'text-left bg-gray-200 p-2 rounded mb-2';
+                messageDiv.innerText = messageData.text;
+                document.getElementById('chatMessages').appendChild(messageDiv);
+            });
+        }
+
+        function loadUserList() {
+            const userListSidebar = document.getElementById('userListSidebar');
+            db.ref(`chats/${currentUser.uid}`).once('value').then(snapshot => {
+                userListSidebar.innerHTML = '';
+                snapshot.forEach(childSnapshot => {
+                    const uid = childSnapshot.key;
+                    db.ref(`users/${uid}`).once('value').then(userSnapshot => {
+                        const userData = userSnapshot.val();
+                        const userDiv = document.createElement('div');
+                        userDiv.className = "p-2 bg-gray-300 rounded cursor-pointer mb-2";
+                        userDiv.innerHTML = `
+                            <p><strong>${userData.name}</strong></p>
+                            <button onclick="location.href='inbox.html?uid=${uid}'">Open Chat</button>
+                        `;
+                        userListSidebar.appendChild(userDiv);
+                    });
+                });
+            });
+        }
+
+        function sendMessage() {
+            const messageText = document.getElementById('messageInput').value;
+            if (messageText.trim() !== '') {
+                const messageData = {
+                    text: messageText,
+                    senderUID: currentUser.uid,
+                    timestamp: Date.now()
+                };
+
+                db.ref(`chats/${currentUser.uid}/${otherUserUID}`).push(messageData);
+                db.ref(`chats/${otherUserUID}/${currentUser.uid}`).push(messageData);
+                
+                document.getElementById('messageInput').value = '';
+            }
+        }
+    </script>
+</body>
+</html>

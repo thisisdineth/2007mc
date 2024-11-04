@@ -6,7 +6,6 @@
     <title>User List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <style>
-        /* Card hover effects */
         .user-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -14,16 +13,12 @@
             transform: translateY(-5px);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-
-        /* Button styling */
         .message-btn {
             transition: background-color 0.3s ease;
         }
         .message-btn:hover {
             background-color: #3b82f6;
         }
-
-        /* Responsive grid for mobile */
         @media (max-width: 640px) {
             .grid-cols-3 {
                 grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -36,13 +31,11 @@
     <section class="p-6">
         <h1 class="text-2xl font-bold mb-4">Chats & Requests</h1>
         
-        <!-- User List Container -->
         <div id="userList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <!-- Cards are dynamically loaded here -->
+            <!-- Cards will be dynamically loaded here -->
         </div>
     </section>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
@@ -72,34 +65,44 @@ const firebaseConfig = {
             }
         });
 
-        function loadUserList() {
+        async function loadUserList() {
             const userList = document.getElementById('userList');
+            userList.innerHTML = '';
 
-            // Fetch users who have chatted with the current user
-            db.ref(`chats/${currentUser.uid}`).once('value').then(snapshot => {
-                snapshot.forEach(childSnapshot => {
-                    const uid = childSnapshot.key;
+            // Retrieve chats and sort by latest timestamp
+            const chatSnapshot = await db.ref(`chats/${currentUser.uid}`).orderByChild('lastMessageTime').once('value');
+            const userArray = [];
 
-                    // Fetch user details for each UID
-                    db.ref(`users/${uid}`).once('value').then(userSnapshot => {
-                        const userData = userSnapshot.val();
-                        const userCard = document.createElement('div');
-                        userCard.className = "user-card bg-white p-4 rounded-lg shadow-lg flex flex-col items-center text-center";
+            chatSnapshot.forEach(childSnapshot => {
+                const uid = childSnapshot.key;
+                const lastMessageTime = childSnapshot.child('lastMessageTime').val() || 0;
 
-                        userCard.innerHTML = `
-                            <img src="${userData.profilePicture || 'default-profile.png'}" alt="${userData.name}" class="w-16 h-16 rounded-full mb-3">
-                            <h2 class="font-semibold text-lg">${userData.name}</h2>
-                            <button onclick="openChat('${uid}')" class="message-btn bg-blue-500 text-white px-4 py-2 rounded mt-4">Message</button>
-                        `;
-                        
-                        userList.appendChild(userCard);
-                    });
-                });
+                // Add user info and last message time to the array
+                userArray.push({ uid, lastMessageTime });
             });
+
+            // Sort users by last message time in descending order (latest first)
+            userArray.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
+
+            // Create user cards based on sorted array
+            for (const { uid } of userArray) {
+                const userSnapshot = await db.ref(`users/${uid}`).once('value');
+                const userData = userSnapshot.val();
+
+                const userCard = document.createElement('div');
+                userCard.className = "user-card bg-white p-4 rounded-lg shadow-lg flex flex-col items-center text-center";
+
+                userCard.innerHTML = `
+                    <img src="${userData.profilePicture || 'default-profile.png'}" alt="${userData.name}" class="w-16 h-16 rounded-full mb-3">
+                    <h2 class="font-semibold text-lg">${userData.name}</h2>
+                    <button onclick="openChat('${uid}')" class="message-btn bg-blue-500 text-white px-4 py-2 rounded mt-4">Message</button>
+                `;
+                
+                userList.appendChild(userCard);
+            }
         }
 
         function openChat(uid) {
-            // Redirect to inbox.html with the selected user's UID
             window.location.href = `inbox.html?uid=${uid}`;
         }
     </script>

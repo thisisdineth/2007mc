@@ -52,11 +52,14 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-messaging.js"></script>
+    
     <script>
+        // Firebase Configuration
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
@@ -70,7 +73,8 @@ const firebaseConfig = {
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-        
+        const messaging = firebase.messaging();
+
         const urlParams = new URLSearchParams(window.location.search);
         const otherUserUID = urlParams.get('uid');
         
@@ -81,6 +85,7 @@ const firebaseConfig = {
                 currentUser = user;
                 loadChatMessages();
                 loadUserList();
+                requestNotificationPermission();
             } else {
                 window.location.href = 'sign.html';
             }
@@ -99,6 +104,11 @@ const firebaseConfig = {
 
                 // Auto-scroll to the last message
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Show notification if the message is from the other user
+                if (messageData.senderUID !== currentUser.uid) {
+                    showNotification(messageData.text);
+                }
             });
         }
 
@@ -147,6 +157,25 @@ const firebaseConfig = {
                 db.ref(`chats/${otherUserUID}/${currentUser.uid}`).remove();
                 alert("Chat deleted successfully.");
                 window.location.href = 'userlist.html';
+            }
+        }
+
+        // Request permission to show notifications
+        function requestNotificationPermission() {
+            messaging.requestPermission().then(() => {
+                console.log("Notification permission granted.");
+            }).catch(error => {
+                console.error("Unable to get permission to notify.", error);
+            });
+        }
+
+        // Show notification for new messages
+        function showNotification(messageText) {
+            if (Notification.permission === "granted") {
+                new Notification("New Message", {
+                    body: messageText,
+                    icon: "./img/logo.png"
+                });
             }
         }
     </script>

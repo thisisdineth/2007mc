@@ -66,7 +66,7 @@ async function displayPosts() {
 
         postCard.innerHTML = `
             <div class="flex items-center mb-4">
-                <img src="${post.authorPhoto || 'default-avatar.png'}" alt="Author" class="w-10 h-10 rounded-full">
+                <img src="${post.authorPhoto || './img/def.png'}" alt="Author" class="w-10 h-10 rounded-full">
                 <span class="ml-2 font-bold">${post.authorName}</span>
             </div>
             <p>${post.text}</p>
@@ -141,7 +141,7 @@ async function loadReplies(postId) {
 
         replyDiv.innerHTML = `
             <div class="flex items-center mb-2">
-                <img src="${reply.authorPhoto || 'default-avatar.png'}" alt="Author" class="w-6 h-6 rounded-full">
+                <img src="${reply.authorPhoto || 'img./def.png'}" alt="Author" class="w-6 h-6 rounded-full">
                 <span class="ml-2 text-sm font-semibold">${reply.authorName}</span>
             </div>
             <p class="text-sm">${reply.text}</p>

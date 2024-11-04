@@ -1,5 +1,4 @@
 // Firebase Configuration
-// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
     authDomain: "mc2007-48ecf.firebaseapp.com",
@@ -9,11 +8,11 @@ const firebaseConfig = {
     appId: "1:636819382403:web:e5465f37c94df79409bbb6",
     measurementId: "G-CZ57NENM1Z"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 const storage = firebase.storage();
-
 let currentUser;
 
 auth.onAuthStateChanged(user => {
@@ -21,19 +20,13 @@ auth.onAuthStateChanged(user => {
         currentUser = user;
         loadPosts();
     } else {
-        window.location.href = 'sign.html'; // Redirect to sign-in page
+        window.location.href = 'sign.html';
     }
 });
 
 function submitPost() {
     const postText = document.getElementById('postText').value;
     const postImage = document.getElementById('postImage').files[0];
-
-    if (postText.trim() === "" && !postImage) {
-        alert("Please enter text or select an image.");
-        return;
-    }
-
     const postRef = db.ref('posts').push();
     const postId = postRef.key;
 
@@ -50,7 +43,7 @@ function submitPost() {
                 postData.imageURL = url;
                 savePost(postId, postData);
             });
-        });
+        }).catch(error => console.error("Image upload error:", error));
     } else {
         savePost(postId, postData);
     }
@@ -61,71 +54,60 @@ function savePost(postId, postData) {
         document.getElementById('postText').value = '';
         document.getElementById('postImage').value = '';
         loadPosts();
-        showNotification("New Post!", "Your post has been created.");
-    });
+    }).catch(error => console.error("Error saving post:", error));
 }
 
 function loadPosts() {
     const postList = document.getElementById('postList');
-    postList.innerHTML = ''; // Clear previous posts
+    postList.innerHTML = '';
 
-    db.ref('posts').once('value').then(snapshot => {
+    db.ref('posts').orderByChild('timestamp').once('value').then(snapshot => {
         snapshot.forEach(childSnapshot => {
             const postData = childSnapshot.val();
             const postDiv = document.createElement('div');
             postDiv.className = "post";
-            postDiv.innerHTML = `
-                <div>
-                    <strong>${postData.authorUID}</strong>
-                    <p>${new Date(postData.timestamp).toLocaleString()}</p>
+
+            // Fetch and display author info (name and profile photo)
+            db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
+                const userData = userSnapshot.val();
+                postDiv.innerHTML = `
+                    <div class="flex items-center mb-2">
+                        <img src="${userData.profilePicture}" alt="${userData.name}" class="w-10 h-10 rounded-full mr-2">
+                        <strong>${userData.name}</strong>
+                        <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
+                    </div>
                     <p>${postData.text || ''}</p>
                     ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image"/>` : ''}
-                </div>
-                <div class="post-actions">
-                    <button onclick="deletePost('${childSnapshot.key}')" class="text-red-500">Delete</button>
-                </div>
-            `;
-            postList.appendChild(postDiv);
+                    <div class="post-actions">
+                        <button onclick="deletePost('${childSnapshot.key}')" class="text-red-500">Delete</button>
+                        <button onclick="replyToPost('${childSnapshot.key}')" class="text-blue-500">Reply</button>
+                        <button onclick="likePost('${childSnapshot.key}')" class="text-green-500">Like</button>
+                    </div>
+                `;
+                postList.appendChild(postDiv);
+            }).catch(error => console.error("Error fetching user info:", error));
         });
-    });
+    }).catch(error => console.error("Error loading posts:", error));
 }
 
 function deletePost(postId) {
-    if (confirm("Are you sure you want to delete this post?")) {
-        db.ref(`posts/${postId}`).remove().then(() => {
-            loadPosts();
-            showNotification("Post Deleted", "Your post has been deleted.");
-        });
+    db.ref(`posts/${postId}`).remove().then(() => {
+        loadPosts();
+    }).catch(error => console.error("Error deleting post:", error));
+}
+
+function replyToPost(postId) {
+    const replyText = prompt("Enter your reply:");
+    if (replyText) {
+        const replyData = {
+            text: replyText,
+            authorUID: currentUser.uid,
+            timestamp: Date.now()
+        };
+        db.ref(`posts/${postId}/replies`).push(replyData).catch(error => console.error("Error replying to post:", error));
     }
 }
 
-function showNotification(title, message) {
-    const options = {
-        body: message,
-        icon: '/path/to/icon.png' // Change to your notification icon
-    };
-    if (Notification.permission === "granted") {
-        new Notification(title, options);
-    } else if (Notification.permission === "default") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                new Notification(title, options);
-            }
-        });
-    }
+function likePost(postId) {
+    db.ref(`posts/${postId}/likes/${currentUser.uid}`).set(true).catch(error => console.error("Error liking post:", error));
 }
-
-// Initialize Firebase Cloud Messaging
-const messaging = firebase.messaging();
-messaging.usePublicVapidKey("YOUR_PUBLIC_VAPID_KEY"); // Set your public Vapid key here
-messaging.requestPermission()
-    .then(() => {
-        console.log('Notification permission granted.');
-        return messaging.getToken();
-    })
-    .then(token => {
-        console.log('FCM Token:', token);
-    })
-    .catch(err => {
-        console.error('Unable to get permission to notify.', err);
-    });

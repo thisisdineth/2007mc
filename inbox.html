@@ -19,6 +19,7 @@
             padding: 8px;
             margin: 5px 0;
             border-radius: 20px;
+            position: relative;
         }
         
         .chat-bubble.sent {
@@ -33,6 +34,20 @@
             color: #111827;
             text-align: left;
         }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
@@ -42,11 +57,19 @@
         
         <!-- Right Chat Box -->
         <div class="flex flex-col w-full sm:w-2/3 p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold">Chat</h2>
-                <button onclick="deleteChat()" class="text-red-500 font-semibold">Delete Chat</button>
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <img id="otherUserProfilePic" src="" alt="Profile Picture" class="w-10 h-10 rounded-full">
+                <div>
+                    <h2 id="otherUserName" class="text-lg font-bold">Chat</h2>
+                    <p id="otherUserStatus" class="text-sm text-gray-500"></p>
+                </div>
+                <button onclick="deleteChat()" class="text-red-500 font-semibold ml-auto">Delete Chat</button>
             </div>
+            <!-- Chat Messages -->
             <div id="chatMessages" class="flex-1 overflow-y-auto bg-white p-4 rounded shadow-inner"></div>
+            <div id="typingIndicator" class="typing-indicator"></div>
+            <!-- Input and Send Button -->
             <input type="text" id="messageInput" placeholder="Type your message..." class="border border-gray-300 p-2 mt-4 rounded w-full">
             <button onclick="sendMessage()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Send</button>
         </div>
@@ -82,6 +105,7 @@ const firebaseConfig = {
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
+                loadChatHeader();
                 loadChatMessages();
                 loadUserList();
                 requestNotificationPermission();
@@ -89,6 +113,25 @@ const firebaseConfig = {
                 window.location.href = 'sign.html';
             }
         });
+
+        function loadChatHeader() {
+    db.ref(`users/${otherUserUID}`).once('value').then(snapshot => {
+        const userData = snapshot.val();
+        document.getElementById('otherUserName').innerText = userData.name;
+        document.getElementById('otherUserProfilePic').src = userData.profilePicture;
+        
+        // Update online/offline status
+        db.ref(`status/${otherUserUID}`).on('value', statusSnapshot => {
+            const status = statusSnapshot.val();
+            if (status) {
+                document.getElementById('otherUserStatus').innerText = status.online ? 'Online' : `Last seen: ${new Date(status.lastSeen).toLocaleString()}`;
+            } else {
+                document.getElementById('otherUserStatus').innerText = "Offline";
+            }
+        });
+    });
+}
+
 
         function loadChatMessages() {
             const chatMessages = document.getElementById('chatMessages');
@@ -101,10 +144,8 @@ const firebaseConfig = {
                 messageDiv.innerText = messageData.text;
                 chatMessages.appendChild(messageDiv);
 
-                // Auto-scroll to the last message
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                // Show notification if the message is from the other user
                 if (messageData.senderUID !== currentUser.uid) {
                     showNotification(messageData.text);
                 }
@@ -145,7 +186,7 @@ const firebaseConfig = {
 
                 db.ref(`chats/${currentUser.uid}/${otherUserUID}`).push(messageData);
                 db.ref(`chats/${otherUserUID}/${currentUser.uid}`).push(messageData);
-                
+
                 document.getElementById('messageInput').value = '';
             }
         }
@@ -159,7 +200,19 @@ const firebaseConfig = {
             }
         }
 
-        // Request permission to show notifications
+        // Typing Indicator
+        document.getElementById('messageInput').addEventListener('input', () => {
+            db.ref(`chats/${otherUserUID}/typing`).set(currentUser.uid);
+            setTimeout(() => {
+                db.ref(`chats/${otherUserUID}/typing`).remove();
+            }, 2000);
+        });
+
+        db.ref(`chats/${currentUser.uid}/typing`).on('value', snapshot => {
+            const typingUID = snapshot.val();
+            document.getElementById('typingIndicator').innerText = typingUID === otherUserUID ? "User is typing..." : "";
+        });
+
         function requestNotificationPermission() {
             messaging.requestPermission().then(() => {
                 console.log("Notification permission granted.");
@@ -168,10 +221,9 @@ const firebaseConfig = {
             });
         }
 
-        // Show notification for new messages
         function showNotification(messageText) {
             if (Notification.permission === "granted") {
-                new Notification("New Message", {
+                new Notification("Bro a New Message", {
                     body: messageText,
                     icon: "./img/logo.png"
                 });

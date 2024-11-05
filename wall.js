@@ -1,4 +1,3 @@
-// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
     authDomain: "mc2007-48ecf.firebaseapp.com",
@@ -8,6 +7,7 @@ const firebaseConfig = {
     appId: "1:636819382403:web:e5465f37c94df79409bbb6",
     measurementId: "G-CZ57NENM1Z"
 };
+
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -24,7 +24,12 @@ auth.onAuthStateChanged(user => {
     }
 });
 
+function showLoadingSpinner(show) {
+    document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
+}
+
 function submitPost() {
+    showLoadingSpinner(true);
     const postText = document.getElementById('postText').value;
     const postImage = document.getElementById('postImage').files[0];
     const postRef = db.ref('posts').push();
@@ -43,7 +48,10 @@ function submitPost() {
                 postData.imageURL = url;
                 savePost(postId, postData);
             });
-        }).catch(error => console.error("Image upload error:", error));
+        }).catch(error => {
+            console.error("Image upload error:", error);
+            showLoadingSpinner(false);
+        });
     } else {
         savePost(postId, postData);
     }
@@ -53,11 +61,16 @@ function savePost(postId, postData) {
     db.ref(`posts/${postId}`).set(postData).then(() => {
         document.getElementById('postText').value = '';
         document.getElementById('postImage').value = '';
+        showLoadingSpinner(false);
         loadPosts();
-    }).catch(error => console.error("Error saving post:", error));
+    }).catch(error => {
+        console.error("Error saving post:", error);
+        showLoadingSpinner(false);
+    });
 }
 
 function loadPosts() {
+    showLoadingSpinner(true);
     const postList = document.getElementById('postList');
     postList.innerHTML = '';
 
@@ -67,7 +80,6 @@ function loadPosts() {
             const postDiv = document.createElement('div');
             postDiv.className = "post";
 
-            // Fetch and display author info (name and profile photo)
             db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
                 const userData = userSnapshot.val();
                 postDiv.innerHTML = `
@@ -77,7 +89,7 @@ function loadPosts() {
                         <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
                     </div>
                     <p>${postData.text || ''}</p>
-                    ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image"/>` : ''}
+                    ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
                     <div class="post-actions">
                         <button onclick="deletePost('${childSnapshot.key}')" class="text-red-500">Delete</button>
                         <button onclick="replyToPost('${childSnapshot.key}')" class="text-blue-500">Reply</button>
@@ -87,7 +99,11 @@ function loadPosts() {
                 postList.appendChild(postDiv);
             }).catch(error => console.error("Error fetching user info:", error));
         });
-    }).catch(error => console.error("Error loading posts:", error));
+        showLoadingSpinner(false);
+    }).catch(error => {
+        console.error("Error loading posts:", error);
+        showLoadingSpinner(false);
+    });
 }
 
 function deletePost(postId) {

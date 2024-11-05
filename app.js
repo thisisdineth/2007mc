@@ -36,8 +36,13 @@ function displayUserCards() {
 
         const verifiedUIDs = [
             'jdBwmNdYPVSs3UNRkHOEiYtBGM72',
-            'anotherUID1',
-            'anotherUID2'
+            'ZSjgjDWxHhaEnzyFAtwqbUQvZg13',
+            'N1ML5xoP0AWGzTlGJco4n1tn4qU2',
+            'M8ldPJGh4ffDJk0h00GQS1WtdOy2',
+            'TGfi1hLvB4U70NxzHcUHBD0EeiF3',
+            'M8ldPJGh4ffDJk0h00GQS1WtdOy2',
+            'eVaD1Fw2aMS8o5ztC1g9HRhdNdn2',
+            'bqkF5SYkPOhqxY3IqZVWumRkvg33',
         ];
 
         // Convert users object to array

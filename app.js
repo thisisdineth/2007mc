@@ -1,13 +1,4 @@
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4",
-    authDomain: "mc2007-48ecf.firebaseapp.com",
-    projectId: "mc2007-48ecf",
-    storageBucket: "mc2007-48ecf.appspot.com",
-    messagingSenderId: "636819382403",
-    appId: "1:636819382403:web:e5465f37c94df79409bbb6",
-    measurementId: "G-CZ57NENM1Z"
-};
+const _0x19ebb2=_0x171b;(function(_0x1ce534,_0x5a92b7){const _0x6b7044=_0x171b,_0x587376=_0x1ce534();while(!![]){try{const _0xc2800f=parseInt(_0x6b7044(0x1f6))/0x1*(-parseInt(_0x6b7044(0x1f1))/0x2)+parseInt(_0x6b7044(0x1ee))/0x3*(-parseInt(_0x6b7044(0x1ed))/0x4)+parseInt(_0x6b7044(0x1f4))/0x5*(-parseInt(_0x6b7044(0x1fa))/0x6)+-parseInt(_0x6b7044(0x1fb))/0x7*(parseInt(_0x6b7044(0x1fc))/0x8)+parseInt(_0x6b7044(0x1f0))/0x9+-parseInt(_0x6b7044(0x1f3))/0xa+parseInt(_0x6b7044(0x1ec))/0xb*(parseInt(_0x6b7044(0x1f2))/0xc);if(_0xc2800f===_0x5a92b7)break;else _0x587376['push'](_0x587376['shift']());}catch(_0x464d61){_0x587376['push'](_0x587376['shift']());}}}(_0x5c12,0x28484));function _0x171b(_0x131dc5,_0xb74c7f){const _0x5c1221=_0x5c12();return _0x171b=function(_0x171b12,_0x424162){_0x171b12=_0x171b12-0x1eb;let _0x419b9e=_0x5c1221[_0x171b12];return _0x419b9e;},_0x171b(_0x131dc5,_0xb74c7f);}const firebaseConfig={'apiKey':_0x19ebb2(0x1f9),'authDomain':_0x19ebb2(0x1eb),'projectId':_0x19ebb2(0x1ef),'storageBucket':_0x19ebb2(0x1f8),'messagingSenderId':_0x19ebb2(0x1f5),'appId':_0x19ebb2(0x1f7),'measurementId':'G-CZ57NENM1Z'};function _0x5c12(){const _0xe2390f=['33ayFGXZ','52sRsuVa','51126KxfYEI','mc2007-48ecf','1033857eJAESP','6lPXYwF','3953328pDxJpz','3299620vFEFAl','540RqIPPz','636819382403','47111qRRDtr','1:636819382403:web:e5465f37c94df79409bbb6','mc2007-48ecf.appspot.com','AIzaSyD1LRguv9N_gRI2kZFjdqNA5fvN8AqXyx4','1092DhdnZr','394996qjgdfE','32pQfEIT','mc2007-48ecf.firebaseapp.com'];_0x5c12=function(){return _0xe2390f;};return _0x5c12();}
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);

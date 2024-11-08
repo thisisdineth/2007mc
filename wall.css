@@ -1,8 +1,4 @@
-/* Background and container */
-body {
-    background: linear-gradient(135deg, #f0e68c, #fff);
-    font-family: Arial, sans-serif;
-}
+
 
 .container {
     max-width: 600px;

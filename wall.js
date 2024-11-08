@@ -162,7 +162,6 @@ function renderPosts(postsArray) {
                 <div class="post-actions">
                     <button onclick="deletePost('${post.id}')" class="text-red-500">Delete</button>
                     <button onclick="replyToPost('${post.id}')" class="text-blue-500">Reply</button>
-                    <button onclick="likePost('${post.id}')" class="text-green-500">Like</button>
                 </div>
                 <div class="replies mt-4"></div> <!-- Container for replies -->
             `;

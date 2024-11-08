@@ -62,8 +62,7 @@ function savePost(postId, postData) {
         document.getElementById('postText').value = '';
         document.getElementById('postImage').value = '';
         showLoadingSpinner(false);
-        // Only call loadPosts once here after a successful post submission
-        loadPosts(); 
+        loadPosts();
     }).catch(error => {
         console.error("Error saving post:", error);
         showLoadingSpinner(false);
@@ -71,101 +70,71 @@ function savePost(postId, postData) {
 }
 
 function loadPosts() {
-    showLoadingSpinner(true);  // Show spinner while loading posts
+    showLoadingSpinner(true);
     const postList = document.getElementById('postList');
     postList.innerHTML = '';
 
-    // Remove previous listeners to avoid duplicates
-    db.ref('posts').off('child_added'); // Remove any existing listener
+    // Listen for any changes in the posts
+    db.ref('posts').orderByChild('timestamp').on('child_added', snapshot => {
+        const postData = snapshot.val();
+        const postDiv = document.createElement('div');
+        postDiv.className = "post";
+        
+        // Fetch user data for the post's author
+        db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
+            const userData = userSnapshot.val();
+            postDiv.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <img src="${userData.profilePicture}" alt="${userData.name}" class="w-10 h-10 rounded-full mr-2">
+                    <strong>${userData.name}</strong>
+                    <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
+                </div>
+                <p>${postData.text || ''}</p>
+                ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
+                <div class="post-actions">
+                    <button onclick="deletePost('${snapshot.key}')" class="text-red-500">Delete</button>
+                    <button onclick="replyToPost('${snapshot.key}')" class="text-blue-500">Reply</button>
+                    <button onclick="likePost('${snapshot.key}')" class="text-green-500">Like</button>
+                </div>
+                <div class="replies mt-4"></div> <!-- Container for replies -->
+            `;
+            
+            postList.appendChild(postDiv);
 
-    // Listen for any changes in the posts (fresh load)
-    db.ref('posts').orderByChild('timestamp').once('value').then(snapshot => {
-        snapshot.forEach(postSnapshot => {
-            const postData = postSnapshot.val();
-            const postDiv = document.createElement('div');
-            postDiv.className = "post";
-            postDiv.setAttribute('data-post-id', postSnapshot.key); // Set post ID to match
-
-            // Fetch user data for the post's author
-            db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
-                const userData = userSnapshot.val();
-                postDiv.innerHTML = `
-                    <div class="flex items-center mb-2">
-                        <img src="${userData.profilePicture}" alt="${userData.name}" class="w-10 h-10 rounded-full mr-2">
-                        <strong>${userData.name}</strong>
-                        <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
-                    </div>
-                    <p>${postData.text || ''}</p>
-                    ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
-                    <div class="post-actions">
-                        <button onclick="deletePost('${postSnapshot.key}')" class="text-red-500">Delete</button>
-                        <button onclick="replyToPost('${postSnapshot.key}')" class="text-blue-500">Reply</button>
-                        <button onclick="likePost('${postSnapshot.key}')" class="text-green-500">Like</button>
-                    </div>
-                    <div class="replies mt-4"></div> <!-- Container for replies -->
-                `;
+            // Load and display replies for the post
+            const repliesDiv = postDiv.querySelector('.replies');
+            db.ref(`posts/${snapshot.key}/replies`).on('child_added', replySnapshot => {
+                const replyData = replySnapshot.val();
+                const replyDiv = document.createElement('div');
+                replyDiv.className = "reply mb-2 p-2 border-t border-gray-300";
                 
-                postList.appendChild(postDiv);
-
-                // Load and display replies for the post
-                const repliesDiv = postDiv.querySelector('.replies');
-                showLoadingSpinner(true);  // Show spinner while loading replies
-                db.ref(`posts/${postSnapshot.key}/replies`).on('child_added', replySnapshot => {
-                    const replyData = replySnapshot.val();
-                    const replyDiv = document.createElement('div');
-                    replyDiv.className = "reply mb-2 p-2 border-t border-gray-300";
-                    
-                    db.ref(`users/${replyData.authorUID}`).once('value').then(replyUserSnapshot => {
-                        const replyUserData = replyUserSnapshot.val();
-                        replyDiv.innerHTML = `
-                            <div class="flex items-center mb-1">
-                                <img src="${replyUserData.profilePicture}" alt="${replyUserData.name}" class="w-8 h-8 rounded-full mr-2">
-                                <strong>${replyUserData.name}</strong>
-                                <span class="ml-2 text-xs text-gray-500">${new Date(replyData.timestamp).toLocaleString()}</span>
-                            </div>
-                            <p class="ml-10">${replyData.text}</p>
-                        `;
-                        repliesDiv.appendChild(replyDiv);
-                    });
+                db.ref(`users/${replyData.authorUID}`).once('value').then(replyUserSnapshot => {
+                    const replyUserData = replyUserSnapshot.val();
+                    replyDiv.innerHTML = `
+                        <div class="flex items-center mb-1">
+                            <img src="${replyUserData.profilePicture}" alt="${replyUserData.name}" class="w-8 h-8 rounded-full mr-2">
+                            <strong>${replyUserData.name}</strong>
+                            <span class="ml-2 text-xs text-gray-500">${new Date(replyData.timestamp).toLocaleString()}</span>
+                        </div>
+                        <p class="ml-10">${replyData.text}</p>
+                    `;
+                    repliesDiv.appendChild(replyDiv);
                 });
+            });
+        }).catch(error => console.error("Error fetching user info:", error));
+    });
 
-                showLoadingSpinner(false);  // Hide spinner after replies are loaded
-            }).catch(error => console.error("Error fetching user info:", error));
+    // Listen for post updates (edits/deletes) and remove/add them accordingly
+    db.ref('posts').on('child_removed', snapshot => {
+        const postDivs = document.querySelectorAll('.post');
+        postDivs.forEach(postDiv => {
+            if (postDiv.getAttribute('data-post-id') === snapshot.key) {
+                postDiv.remove(); // Remove the post element from the DOM
+            }
         });
-
-        // Now listen for new posts being added to the database
-        db.ref('posts').orderByChild('timestamp').on('child_added', snapshot => {
-            const postData = snapshot.val();
-            const postDiv = document.createElement('div');
-            postDiv.className = "post";
-            postDiv.setAttribute('data-post-id', snapshot.key);
-
-            // Fetch user data for the post's author
-            db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
-                const userData = userSnapshot.val();
-                postDiv.innerHTML = `
-                    <div class="flex items-center mb-2">
-                        <img src="${userData.profilePicture}" alt="${userData.name}" class="w-10 h-10 rounded-full mr-2">
-                        <strong>${userData.name}</strong>
-                        <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
-                    </div>
-                    <p>${postData.text || ''}</p>
-                    ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
-                    <div class="post-actions">
-                        <button onclick="deletePost('${snapshot.key}')" class="text-red-500">Delete</button>
-                        <button onclick="replyToPost('${snapshot.key}')" class="text-blue-500">Reply</button>
-                        <button onclick="likePost('${snapshot.key}')" class="text-green-500">Like</button>
-                    </div>
-                    <div class="replies mt-4"></div> <!-- Container for replies -->
-                `;
-                postList.appendChild(postDiv);
-            }).catch(error => console.error("Error fetching user info:", error));
-        });
-    }).catch(error => console.error("Error loading posts:", error));
+    });
+    showLoadingSpinner(false);
 }
-
-
-
 
 
 

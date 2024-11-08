@@ -75,14 +75,23 @@ function savePost(postId, postData) {
     });
 }
 
-// Initialize listeners for loading posts and replies
+// Initialize listeners for loading posts with shuffling
 function initializeListeners() {
-    // Remove any existing listeners to prevent duplicates
+    // Remove any existing listeners to avoid duplication
     db.ref('posts').off();
 
-    // Attach fresh listeners for posts
-    db.ref('posts').orderByChild('timestamp').on('child_added', snapshot => {
-        addPostToDOM(snapshot);
+    // Fetch posts once, shuffle them, and render them
+    db.ref('posts').orderByChild('timestamp').on('value', snapshot => {
+        const postsArray = [];
+        snapshot.forEach(childSnapshot => {
+            postsArray.push({ id: childSnapshot.key, data: childSnapshot.val() });
+        });
+        
+        // Shuffle the posts array using the Fisher-Yates shuffle
+        shuffleArray(postsArray);
+        
+        // Render shuffled posts
+        renderPosts(postsArray);
     });
 
     // Listen for post removals
@@ -92,36 +101,48 @@ function initializeListeners() {
     });
 }
 
-// Load and display a single post, including replies
-function addPostToDOM(snapshot) {
-    const postData = snapshot.val();
+// Fisher-Yates shuffle algorithm to shuffle an array in-place
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+}
+
+// Render shuffled posts to the DOM
+function renderPosts(postsArray) {
     const postList = document.getElementById('postList');
-    const postDiv = document.createElement('div');
-    postDiv.className = "post";
-    postDiv.setAttribute('data-post-id', snapshot.key); // Set data attribute for reference
+    postList.innerHTML = ''; // Clear existing posts
 
-    // Fetch and display the author's user data
-    db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
-        const userData = userSnapshot.val();
-        postDiv.innerHTML = `
-            <div class="flex items-center mb-2">
-                <img src="${userData.profilePicture}" alt="${userData.name}" class="w-10 h-10 rounded-full mr-2">
-                <strong>${userData.name}</strong>
-                <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
-            </div>
-            <p>${postData.text || ''}</p>
-            ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
-            <div class="post-actions">
-                <button onclick="deletePost('${snapshot.key}')" class="text-red-500">Delete</button>
-                <button onclick="replyToPost('${snapshot.key}')" class="text-blue-500">Reply</button>
-                <button onclick="likePost('${snapshot.key}')" class="text-green-500">Like</button>
-            </div>
-            <div class="replies mt-4"></div> <!-- Container for replies -->
-        `;
+    // Render each post in the shuffled order
+    postsArray.forEach(post => {
+        const postDiv = document.createElement('div');
+        postDiv.className = "post";
+        postDiv.setAttribute('data-post-id', post.id);
 
-        postList.appendChild(postDiv);
-        loadReplies(snapshot.key, postDiv.querySelector('.replies'));
-    }).catch(error => console.error("Error fetching user info:", error));
+        const postData = post.data;
+        db.ref(`users/${postData.authorUID}`).once('value').then(userSnapshot => {
+            const userData = userSnapshot.val();
+            postDiv.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <img src="${userData.profilePicture}" alt="${userData.name}" class="w-10 h-10 rounded-full mr-2">
+                    <strong>${userData.name}</strong>
+                    <span class="ml-2 text-sm text-gray-500">${new Date(postData.timestamp).toLocaleString()}</span>
+                </div>
+                <p>${postData.text || ''}</p>
+                ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
+                <div class="post-actions">
+                    <button onclick="deletePost('${post.id}')" class="text-red-500">Delete</button>
+                    <button onclick="replyToPost('${post.id}')" class="text-blue-500">Reply</button>
+                    <button onclick="likePost('${post.id}')" class="text-green-500">Like</button>
+                </div>
+                <div class="replies mt-4"></div> <!-- Container for replies -->
+            `;
+
+            postList.appendChild(postDiv);
+            loadReplies(post.id, postDiv.querySelector('.replies'));
+        }).catch(error => console.error("Error fetching user info:", error));
+    });
 }
 
 // Load replies for a given post and display them

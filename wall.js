@@ -100,6 +100,9 @@ function savePost(postId, postData) {
 }
 
 
+
+
+
 // Initialize listeners for loading posts with shuffling
 function initializeListeners() {
     // Remove any existing listeners to avoid duplication
@@ -218,4 +221,41 @@ function replyToPost(postId) {
 // Like a post by adding a like entry
 function likePost(postId) {
     db.ref(`posts/${postId}/likes/${currentUser.uid}`).set(true).catch(error => console.error("Error liking post:", error));
+}
+function applyFilter() {
+    const showOnlyMyPosts = document.getElementById('filterMyPosts').checked;
+    initializeListeners(showOnlyMyPosts);
+}
+
+// Modified initializeListeners to accept a filter parameter
+function initializeListeners(filterByUser = false) {
+    db.ref('posts').off();
+
+    db.ref('posts').orderByChild('timestamp').on('value', snapshot => {
+        const postsArray = [];
+        snapshot.forEach(childSnapshot => {
+            const postData = childSnapshot.val();
+            const post = { id: childSnapshot.key, data: postData };
+
+            // If filtering, only add posts by the current user or those commented by the user
+            if (filterByUser) {
+                if (postData.authorUID === currentUser.uid) {
+                    postsArray.push(post);
+                } else if (postData.replies) {
+                    const userCommented = Object.values(postData.replies).some(reply => reply.authorUID === currentUser.uid);
+                    if (userCommented) postsArray.push(post);
+                }
+            } else {
+                postsArray.push(post);
+            }
+        });
+
+        shuffleArray(postsArray);
+        renderPosts(postsArray);
+    });
+
+    db.ref('posts').on('child_removed', snapshot => {
+        const postDiv = document.querySelector(`.post[data-post-id="${snapshot.key}"]`);
+        if (postDiv) postDiv.remove();
+    });
 }

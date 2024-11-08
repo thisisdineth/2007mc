@@ -16,9 +16,15 @@
             <button type="submit" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Post</button>
             <div id="loadingSpinner" class="spinner hidden"></div>
         </form>
+        
+        <!-- Filter Checkbox -->
+        <label class="flex items-center mb-4">
+            <input type="checkbox" id="filterMyPosts" onchange="applyFilter()" class="mr-2">
+            <span>Show only posts posted or commented by me</span>
+        </label>
+
         <div id="postList" class="mt-4"></div>
     </div>
-    
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>

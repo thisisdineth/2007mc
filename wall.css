@@ -1,5 +1,13 @@
+body{
+    background: linear-gradient(135deg, #987d01, #ffffff);
+}
+
 .container {
     max-width: 600px;
+}
+
+.post {
+background: none;
 }
 
 .spinner {

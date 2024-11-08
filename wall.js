@@ -30,7 +30,6 @@ function showLoadingSpinner(show) {
     document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
 }
 
-// Submit a new post with optional image upload
 function submitPost() {
     showLoadingSpinner(true);
     const postText = document.getElementById('postText').value;
@@ -44,6 +43,7 @@ function submitPost() {
         timestamp: Date.now(),
     };
 
+    // Handle image upload (if present)
     if (postImage) {
         const storageRef = storage.ref(`posts/${postId}/${postImage.name}`);
         storageRef.put(postImage).then(() => {
@@ -63,7 +63,31 @@ function submitPost() {
     }
 }
 
-// Save post data to the database
+function initializeListeners() {
+    db.ref('posts').off();
+    db.ref('posts').orderByChild('timestamp').on('value', snapshot => {
+        const postsArray = [];
+        snapshot.forEach(childSnapshot => {
+            postsArray.push({ id: childSnapshot.key, data: childSnapshot.val() });
+        });
+
+        shuffleArray(postsArray);
+        renderPosts(postsArray);
+    });
+
+    db.ref('posts').on('child_removed', snapshot => {
+        const postDiv = document.querySelector(`.post[data-post-id="${snapshot.key}"]`);
+        if (postDiv) postDiv.remove();
+    });
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 function savePost(postId, postData) {
     db.ref(`posts/${postId}`).set(postData).then(() => {
         document.getElementById('postText').value = '';
@@ -74,6 +98,7 @@ function savePost(postId, postData) {
         showLoadingSpinner(false);
     });
 }
+
 
 // Initialize listeners for loading posts with shuffling
 function initializeListeners() {

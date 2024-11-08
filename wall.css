@@ -40,6 +40,12 @@
     border-radius: 10px;
     object-fit: cover;
 }
+.reply {
+    margin-left: 20px;
+    border-left: 2px solid #e5e7eb;
+    padding-left: 10px;
+}
+
 
 .post-actions {
     display: flex;

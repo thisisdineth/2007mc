@@ -95,8 +95,33 @@ function loadPosts() {
                         <button onclick="replyToPost('${childSnapshot.key}')" class="text-blue-500">Reply</button>
                         <button onclick="likePost('${childSnapshot.key}')" class="text-green-500">Like</button>
                     </div>
+                    <div class="replies mt-4"></div> <!-- Container for replies -->
                 `;
+                
                 postList.appendChild(postDiv);
+
+                // Load and display replies
+                const repliesDiv = postDiv.querySelector('.replies');
+                db.ref(`posts/${childSnapshot.key}/replies`).orderByChild('timestamp').once('value').then(repliesSnapshot => {
+                    repliesSnapshot.forEach(replySnapshot => {
+                        const replyData = replySnapshot.val();
+                        const replyDiv = document.createElement('div');
+                        replyDiv.className = "reply mb-2 p-2 border-t border-gray-300";
+                        
+                        db.ref(`users/${replyData.authorUID}`).once('value').then(replyUserSnapshot => {
+                            const replyUserData = replyUserSnapshot.val();
+                            replyDiv.innerHTML = `
+                                <div class="flex items-center mb-1">
+                                    <img src="${replyUserData.profilePicture}" alt="${replyUserData.name}" class="w-8 h-8 rounded-full mr-2">
+                                    <strong>${replyUserData.name}</strong>
+                                    <span class="ml-2 text-xs text-gray-500">${new Date(replyData.timestamp).toLocaleString()}</span>
+                                </div>
+                                <p class="ml-10">${replyData.text}</p>
+                            `;
+                            repliesDiv.appendChild(replyDiv);
+                        });
+                    });
+                });
             }).catch(error => console.error("Error fetching user info:", error));
         });
         showLoadingSpinner(false);
@@ -105,6 +130,7 @@ function loadPosts() {
         showLoadingSpinner(false);
     });
 }
+
 
 function deletePost(postId) {
     db.ref(`posts/${postId}`).remove().then(() => {
@@ -120,9 +146,12 @@ function replyToPost(postId) {
             authorUID: currentUser.uid,
             timestamp: Date.now()
         };
-        db.ref(`posts/${postId}/replies`).push(replyData).catch(error => console.error("Error replying to post:", error));
+        db.ref(`posts/${postId}/replies`).push(replyData).then(() => {
+            loadPosts(); // Refresh to show the new reply
+        }).catch(error => console.error("Error replying to post:", error));
     }
 }
+
 
 function likePost(postId) {
     db.ref(`posts/${postId}/likes/${currentUser.uid}`).set(true).catch(error => console.error("Error liking post:", error));

@@ -80,7 +80,34 @@ button[type="submit"]:hover {
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s;
 }
-
+.post-button {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6; /* Blue */
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .post-button:hover {
+    background-color: #2563eb; /* Darker blue */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .post-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+  }
+  
+  .post-button:active {
+    transform: scale(0.95);
+    background-color: #1d4ed8; /* Even darker blue */
+  }
 .post:hover {
     transform: scale(1.02);
 }

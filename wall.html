@@ -12,7 +12,10 @@
         <h1 class="text-2xl font-bold mb-4">ASK ANYTHING ! POST ANYTHING !</h1>
         <form id="postForm" class="mb-4" onsubmit="submitPost(); return false;">
             <textarea id="postText" placeholder="What's on your mind?" class="border border-gray-300 p-2 w-full rounded-md" maxlength="2000"></textarea>
-            <input type="file" id="postImage" accept="image/*" class="mt-2"/>
+            <div class="file-upload-container">
+                <input type="file" id="postImage" accept="image/*" class="file-upload-input mt-2" />
+                <label for="postImage" class="file-upload-label">Upload Image</label>
+              </div>
             <button type="submit" class="post-button">Post</button>
             <div id="loadingSpinner" class="spinner hidden"></div>
         </form>

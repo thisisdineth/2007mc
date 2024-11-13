@@ -160,7 +160,9 @@ function renderPosts(postsArray) {
                 <p>${postData.text || ''}</p>
                 ${postData.imageURL ? `<img src="${postData.imageURL}" alt="Post Image" class="post-image"/>` : ''}
                 <div class="post-actions">
-                    <button onclick="deletePost('${post.id}')" class="text-red-500">Delete</button>
+                    ${postData.authorUID === currentUser.uid ? `
+                        <button onclick="deletePost('${post.id}')" class="text-red-500">Delete</button>
+                    ` : ''}
                     <button onclick="replyToPost('${post.id}')" class="text-blue-500">Reply</button>
                 </div>
                 <div class="replies mt-4"></div> <!-- Container for replies -->
@@ -172,6 +174,7 @@ function renderPosts(postsArray) {
     });
 }
 
+
 // Load replies for a given post and display them
 function loadReplies(postId, repliesDiv) {
     // Clear any existing listeners for replies to prevent duplication
@@ -180,6 +183,7 @@ function loadReplies(postId, repliesDiv) {
     // Attach a listener for replies to the specific post
     db.ref(`posts/${postId}/replies`).on('child_added', replySnapshot => {
         const replyData = replySnapshot.val();
+        const replyId = replySnapshot.key;
         const replyDiv = document.createElement('div');
         replyDiv.className = "reply mb-2 p-2 border-t border-gray-300";
 
@@ -193,16 +197,33 @@ function loadReplies(postId, repliesDiv) {
                     <span class="ml-2 text-xs text-gray-500">${new Date(replyData.timestamp).toLocaleString()}</span>
                 </div>
                 <p class="ml-10">${replyData.text}</p>
+                ${replyData.authorUID === currentUser.uid ? `
+                    <button onclick="deleteReply('${postId}', '${replyId}')" class="text-red-500 text-sm">Delete</button>
+                ` : ''}
             `;
             repliesDiv.appendChild(replyDiv);
         }).catch(error => console.error("Error fetching reply user info:", error));
     });
 }
 
-// Delete a post by its ID
+
 function deletePost(postId) {
-    db.ref(`posts/${postId}`).remove().catch(error => console.error("Error deleting post:", error));
+    // Retrieve the post data to check if the current user is the author
+    db.ref(`posts/${postId}`).once('value').then(snapshot => {
+        const postData = snapshot.val();
+        if (postData.authorUID === currentUser.uid) {
+            // Proceed with deleting the post if the current user is the author
+            db.ref(`posts/${postId}`).remove().catch(error => {
+                console.error("Error deleting post:", error);
+            });
+        } else {
+            alert("You can only delete your own posts.");
+        }
+    }).catch(error => {
+        console.error("Error fetching post data:", error);
+    });
 }
+
 
 // Add a reply to a post
 function replyToPost(postId) {
@@ -217,14 +238,24 @@ function replyToPost(postId) {
     }
 }
 
-// Like a post by adding a like entry
-function likePost(postId) {
-    db.ref(`posts/${postId}/likes/${currentUser.uid}`).set(true).catch(error => console.error("Error liking post:", error));
+function deleteReply(postId, replyId) {
+    // Retrieve the specific reply data
+    db.ref(`posts/${postId}/replies/${replyId}`).once('value').then(snapshot => {
+        const replyData = snapshot.val();
+        if (replyData.authorUID === currentUser.uid) {
+            // Proceed with deleting the reply if the current user is the author
+            db.ref(`posts/${postId}/replies/${replyId}`).remove().catch(error => {
+                console.error("Error deleting reply:", error);
+            });
+        } else {
+            alert("You can only delete your own comments.");
+        }
+    }).catch(error => {
+        console.error("Error fetching reply data:", error);
+    });
 }
-function applyFilter() {
-    const showOnlyMyPosts = document.getElementById('filterMyPosts').checked;
-    initializeListeners(showOnlyMyPosts);
-}
+
+
 
 // Modified initializeListeners to accept a filter parameter
 function initializeListeners(filterByUser = false) {
